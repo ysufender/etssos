@@ -65,6 +65,9 @@ project
             print("    all")
             print("    arch")
             print("    kernel")
+            print("    link")
+            print("    help")
+            print("    clean")
         end))
 
 local result = project:build(arg[1] or "all") or "Success"
