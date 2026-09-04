@@ -1,24 +1,32 @@
+---@module "script.common"
+
+local Linker = require "script.linker"
+
+---@type Efile
 local Efile = require "efile"
 
+---@module "script.arch"
 local Arch = require "script.arch"
 
-local project_name = "etssos"
-local project_version = "0.0.1"
+---@module "script.kernel"
+local Kernel = require "script.kernel"
 
-local cc        = "xtensa-lx106-elf-gcc "
-local cflags    = "-mtest-section-literals "
-                  .."-mlongcalls "
-
-local ld        = "xtensa-lx106-elf-ld "
-local ldflags   = " "
-local ldfile    = "linker.ld"
-
-local kerneldir = "kernel/"
-local driverdir = "drivers/"
+---@type Common.Options
+local options = {
+    name = "etssos",
+    version = "0.0.1",
+    as = "xtensa-lx106-elf-as ",
+    cc = "xtensa-lx106-elf-gcc ",
+    ld = "xtensa-lx106-elf-ld ",
+    cflags = "-c ",
+    asflags = " ",
+    ldflags = "-T linker.ld "
+              .."-nostdlib -nostartfiles -nodefaultlibs ",
+}
 
 ---@type string[]
 local kernelsrc = {
-    "main.c",
+    "kernel.c",
 }
 
 ---@type string[]
@@ -27,17 +35,37 @@ local archsrc = {
 }
 
 local project = Efile.Project
-    .init(project_name)
+    .init(options.name)
 
+project
     :step(Efile.Step
         .init("base")
         :dependOnFile("build.lua"))
 
-    :multiStep(Arch.archsteps())
+    :step(Efile.Step
+        .init("all")
+        :dependOnSteps({
+            "link",
+        }))
 
-for _, step in pairs(project.steps) do
-    print(step.name)
-end
+    :multiStep(Arch.steps(options, archsrc))
+    :multiStep(Kernel.steps(options, kernelsrc))
 
--- local result = project:build(arg[1] or "") or "Success"
--- print(result)
+    :step(Linker.step(project, options))
+
+    :step(Efile.Step
+        .init("clean")
+        :action("rm -rf build"))
+
+    :step(Efile.Step
+        .init("help", { always_run = true })
+        :action(function ()
+            print("usage: efile <target>")
+            print("targets:")
+            print("    all")
+            print("    arch")
+            print("    kernel")
+        end))
+
+local result = project:build(arg[1] or "all") or "Success"
+print(result)
