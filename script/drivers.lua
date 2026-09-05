@@ -18,7 +18,7 @@ end
 
 ---@param sub_path string
 ---@return string
-local function kernel(sub_path) return "kernel/"..sub_path end
+local function driver(sub_path) return "drivers/"..sub_path end
 
 ---@param sub_path string
 ---@return string
@@ -32,14 +32,14 @@ local function steps(options, sources)
     local step_names = { }
 
     for _, src in ipairs(sources) do
-        local resolved_src = kernel(src)
+        local resolved_src = driver(src)
         local cmd, out, pre = cc(resolved_src, options)
         table.insert(step_names, out)
 
         local step = Efile.Step
             .init(out)
             :dependOnStep("base")
-            :dependOnFile("script/kernel.lua")
+            :dependOnFile("script/drivers.lua")
             :dependOnFile(resolved_src)
             :action(cmd)
             :pre(pre)
@@ -52,7 +52,7 @@ local function steps(options, sources)
     end
 
     table.insert(_steps, Efile.Step
-        .init("kernel")
+        .init("drivers")
         :dependOnSteps(step_names))
 
     return _steps

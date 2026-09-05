@@ -1,7 +1,7 @@
-volatile unsigned int testValue;
+#include "../drivers/uart/uart.h"
 
 void kernel_main(void) {
-    for (;;) {
-        (void)testValue;
+    while (1) {
+        UART_PutString("Hello World");
     }
 }

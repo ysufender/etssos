@@ -27,7 +27,8 @@ function Linker.step(project, options)
         .init("link")
         :dependOnSteps({
             "arch",
-            "kernel"
+            "kernel",
+            "drivers",
         })
         :dependOnFile("linker.ld")
         :pre("mkdir -p build/bin/")

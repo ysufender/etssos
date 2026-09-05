@@ -22,7 +22,7 @@ local function arch(sub_path) return "arch/"..sub_path end
 
 ---@param options Common.Options
 ---@param sources string[]
----@return Step[]
+---@return Efile.Step[]
 local function steps(options, sources)
     local _steps = { }
     local step_names = { }

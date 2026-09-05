@@ -11,6 +11,9 @@ local Arch = require "script.arch"
 ---@module "script.kernel"
 local Kernel = require "script.kernel"
 
+---@module "script.drivers"
+local Drivers = require "script.drivers"
+
 ---@module "script.other"
 local Other = require "script.other"
 
@@ -30,8 +33,37 @@ local options = {
     burner = "esptool ",
     board = "esp8266 ",
     port = "/dev/ttyUSB0 ",
-    baud_rate = 9600,
+    baud_rate = 74880,
+    upload_rate = 115200,
 }
+
+local config_string = string.format([[
+#ifndef _ETSSOS_CONFIG_H
+#define _ETSSOS_CONFIG_H
+
+#define ETSSOS_NAME    "%s"
+#define ETSSOS_VERSION "%s"
+
+#define ETSSOS_AS "%s"
+#define ETSSOS_CC "%s"
+#define ETSSOS_LD "%s"
+
+#define ETSSOS_CFLAGS  "%s"
+#define ETSSOS_LDFLAGS "%s"
+#define ETSSOS_ASFLAGS "%s"
+
+#define ETSSOS_BURNER "%s"
+#define ETSSOS_BOARD  "%s"
+#define ETSSOS_PORT   "%s"
+#define ETSSOS_BAUD   %d
+#define ETSSOS_UPLOAD %d
+
+#endif /* _ETSSOS_CONFIG_H */
+]], options.name, options.version,
+    options.as, options.cc, options.ld,
+    options.cflags, options.ldflags, options.asflags,
+    options.burner, options.board, options.port,
+    options.baud_rate, options.upload_rate)
 
 ---@type string[]
 local kernelsrc = {
@@ -43,22 +75,40 @@ local archsrc = {
     "boot.S",
 }
 
+---@type string[]
+local driversrc = {
+    "uart/uart.c",
+    "gpio/gpio.c"
+}
+
 local project = Efile.Project
     .init(options.name)
 
 project
     :step(Efile.Step
         .init("base")
-        :dependOnFile("build.lua"))
+        :dependOnFile("build.lua")
+        :action("mkdir -p config")
+        :action(function ()
+            local file = io.open("config/etssos_config.h", "w")
+            if not file then return "Failed to create config file" end
+
+            local _, err = file:write(config_string)
+
+            if err then
+                return "Failed to create config file: "..err
+            end
+        end))
 
     :step(Efile.Step
         .init("all")
         :dependOnSteps({
-            "upload",
+            "create_bin",
         }))
 
     :multiStep(Arch.steps(options, archsrc))
     :multiStep(Kernel.steps(options, kernelsrc))
+    :multiStep(Drivers.steps(options, driversrc))
 
     :step(Linker.step(project, options))
 
@@ -88,7 +138,6 @@ project
             print("    help")
             print("    clean")
             print("    upload")
-            return false
         end))
 
 local result = project:build(arg[1] or "all") or "Success"

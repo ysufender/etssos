@@ -40,7 +40,7 @@ PLATFORM = {
 ---@field always_run boolean
 
 ---@alias Efile.Step.Command string
----@alias Script fun(): boolean, Efile.Step.Action?
+---@alias Script fun(): string?
 
 ---@class Efile.Step.Complex
 ---@field file string

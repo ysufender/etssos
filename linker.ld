@@ -8,11 +8,6 @@ __stack_top = ORIGIN(dram_seg) + LENGTH(dram_seg);
 ENTRY(_etssos_boot_entry);
 
 SECTIONS {
-    .rodata : {
-        _rodata_start = ABSOLUTE(.);
-        *(.rodata*)
-        _rodata_end = ABSOLUTE(.);
-    } >dram_seg
 
     .bss (NOLOAD) : {
         _bss_start = ABSOLUTE(.);
@@ -25,18 +20,25 @@ SECTIONS {
     .data : {
         _data_start = ABSOLUTE(.);
         *(.data*)
+        . = ALIGN(4);
         _data_end = ABSOLUTE(.);
     } >dram_seg
 
-    .literal : {
-        _literal_start = ABSOLUTE(.);
-        *(.literal*)
-        _literal_end = ABSOLUTE(.);
-    } > iram_seg
-
     .text : {
         _text_start = ABSOLUTE(.);
+        KEEP(*boot.o(.text.reset_vector))
+        *boot.o(.literal*)
+        *boot.o(.text*)
+        *(.literal*)
         *(.text*)
         _text_end = ABSOLUTE(.);
     } > iram_seg
+
+    .rodata : {
+        _rodata_lma = LOADADDR(.rodata);
+        _rodata_start = ABSOLUTE(.);
+        *(.rodata*)
+        . = ALIGN(4);
+        _rodata_end = ABSOLUTE(.);
+    } >dram_seg AT>iram_seg
 }

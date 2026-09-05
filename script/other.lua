@@ -37,13 +37,14 @@ function Other.upload(options)
         local cmd = options.burner
                     .."--chip "..options.board
                     .."--port "..options.port
-                    .."--baud "..tostring(options.baud_rate).." "
+                    .."--baud "..tostring(options.upload_rate).." "
                     .."--no-stub "
                     .."write-flash "..address.." "..match
 
         table.insert(step_names, match)
         table.insert(steps, Efile.Step
             .init(match)
+            :dependOnStep("create_bin")
             :dependOnFile("script/other.lua")
             :action(cmd))
     end
