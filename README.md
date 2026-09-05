@@ -19,6 +19,11 @@ targets:
     link
     help
     clean
+    upload
 ```
 
 > Note: Windows is not supported.
+
+### Uploading
+
+Upload step will only work if you have `esptool` on your path.

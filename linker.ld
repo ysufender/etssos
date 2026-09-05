@@ -18,6 +18,7 @@ SECTIONS {
         _bss_start = ABSOLUTE(.);
         *(.bss*)
         *(COMMON)
+        . = ALIGN(4);
         _bss_end = ABSOLUTE(.);
     } >dram_seg
 

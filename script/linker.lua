@@ -7,9 +7,9 @@ local Efile = require "efile"
 ---@class Linker
 local Linker = {}
 
----@param project Project
+---@param project Efile.Project
 ---@param options Common.Options
----@return Step
+---@return Efile.Step
 function Linker.step(project, options)
     ---@type string[]
     local object_files = { }
