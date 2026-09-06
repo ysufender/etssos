@@ -3,6 +3,16 @@
 ---@type Efile
 local Efile = require "efile"
 
+local asmsources = {
+    "boot.S",
+}
+
+local other = {
+    "arch/archdef.h",
+    "arch/interrupt.S",
+    "script/arch.lua"
+}
+
 ---@param source_path string
 ---@param options Common.Options
 ---@return string, string, string
@@ -21,24 +31,19 @@ end
 local function arch(sub_path) return "arch/"..sub_path end
 
 ---@param options Common.Options
----@param sources string[]
 ---@return Efile.Step[]
-local function steps(options, sources)
+local function steps(options)
     local _steps = { }
     local step_names = { }
 
-    for _, src in ipairs(sources) do
+    for _, src in ipairs(asmsources) do
         local resolved_src = arch(src)
         local cmd, out, pre = asm(resolved_src, options)
         table.insert(step_names, out)
         table.insert(_steps, Efile.Step
             .init(out)
             :dependOnStep("base")
-            :dependOnFile("script/arch.lua")
-            :dependOnFiles({
-                "arch/archdef.h",
-                "arch/interrupt.S",
-            })
+            :dependOnFiles(other)
             :dependOnFile(resolved_src)
             :action(cmd)
             :pre(pre))

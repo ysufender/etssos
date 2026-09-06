@@ -9,14 +9,25 @@ local Common = require "script.common"
 ---@return string
 local function driver(sub_path) return "drivers/"..sub_path end
 
----@param sub_path string
----@return string
-local function header(sub_path) return string.match(sub_path, "(.+%a+.+)%.c")..".h" end
+local sources = {
+    "uart/uart.c",
+    "timer/timer.c",
+    "gpio/gpio.c",
+    "iomux.c",
+}
+
+local other = {
+    driver("uart/uart.h"),
+    driver("timer/timer.h"),
+    driver("gpio/gpio.h"),
+    driver("common.h"),
+    driver("iomux.h"),
+    "script/drivers.lua",
+}
 
 ---@param options Common.Options
----@param sources string[]
 ---@return Efile.Step[]
-local function steps(options, sources)
+local function steps(options)
     local _steps = { }
     local step_names = { }
 
@@ -28,14 +39,10 @@ local function steps(options, sources)
         local step = Efile.Step
             .init(out)
             :dependOnStep("base")
-            :dependOnFile("script/drivers.lua")
+            :dependOnFiles(other)
             :dependOnFile(resolved_src)
             :action(cmd)
             :pre(pre)
-
-        if os.execute("test -e "..header(resolved_src)) then
-            step:dependOnFile(header(resolved_src))
-        end
 
         table.insert(_steps, step)
     end

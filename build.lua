@@ -65,24 +65,6 @@ local config_string = string.format([[
     options.burner, options.board, options.port,
     options.baud_rate, options.upload_rate)
 
----@type string[]
-local kernelsrc = {
-    "kernel.c",
-}
-
----@type string[]
-local archsrc = {
-    "boot.S",
-}
-
----@type string[]
-local driversrc = {
-    "uart/uart.c",
-    "timer/timer.c",
-    "gpio/gpio.c",
-    "iomux.c",
-}
-
 local project = Efile.Project
     .init(options.name)
 
@@ -108,9 +90,9 @@ project
             "create_bin",
         }))
 
-    :multiStep(Arch.steps(options, archsrc))
-    :multiStep(Kernel.steps(options, kernelsrc))
-    :multiStep(Drivers.steps(options, driversrc))
+    :multiStep(Arch.steps(options))
+    :multiStep(Kernel.steps(options))
+    :multiStep(Drivers.steps(options))
 
     :step(Linker.step(project, options))
 

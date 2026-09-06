@@ -19,7 +19,7 @@ local Common = { }
 ---@field ldflags     string
 
 ---@class Common.Step
----@field steps fun(options: Common.Options, sources: string[]): Efile.Step[]
+---@field steps fun(options: Common.Options): Efile.Step[]
 
 ---@param source_path string
 ---@param options Common.Options

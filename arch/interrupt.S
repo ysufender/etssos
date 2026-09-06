@@ -9,7 +9,7 @@
         .org _etssos_interrupt_vector_base + 0x20
         .type NMIException, @function
         NMIException:
-            j NMIException 
+            call0 Kernel_Panic_NonMaskable 
 
         .org _etssos_interrupt_vector_base  + 0x30
         .type KernelException, @function
@@ -19,12 +19,12 @@
         .org _etssos_interrupt_vector_base  + 0x50
         .type UserException, @function
         UserException:
-            j Kernel_Panic
+            j Kernel_Panic_UserError
 
         .org _etssos_interrupt_vector_base  + 0x70
         .type DoubleException, @function
         DoubleException:
-            j Kernel_Panic
+            j Kernel_Panic_Double
 
         .org _etssos_interrupt_vector_base  + 0x80
         .type Reset, @function
@@ -33,6 +33,9 @@
             j _etssos_boot_entry
 
 .section .text
+    .type _etssos_interrupt_common, @function
+    _etssos_interrupt_common:
+
     .type _etssos_reset, @function
     _etssos_reset:
         movi a1, 0
