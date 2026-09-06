@@ -78,7 +78,9 @@ local archsrc = {
 ---@type string[]
 local driversrc = {
     "uart/uart.c",
-    "timer/timer.c"
+    "timer/timer.c",
+    "gpio/gpio.c",
+    "iomux.c",
 }
 
 local project = Efile.Project

@@ -1,6 +1,7 @@
 #include <stdarg.h>
 
 #include "uart.h"
+#include "../iomux.h"
 #include "../timer/timer.h"
 #include "../../config/etssos_config.h"
 
