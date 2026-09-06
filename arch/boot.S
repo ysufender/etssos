@@ -24,7 +24,5 @@
             j _zero_bss
         _bss_done:
 
-        call0 kernel_main 
-
-    __endless_loop:
-        j __endless_loop
+        call0 Kernel_Main 
+        call0 Kernel_Panic_Unreachable

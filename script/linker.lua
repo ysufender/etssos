@@ -36,7 +36,8 @@ function Linker.step(project, options)
             options.ld
                 ..options.ldflags
                 .." -o build/bin/"..project.name..".elf "
-                ..object_files_combined)
+                ..object_files_combined
+                .." /home/joseph/prog/xtensa-lx106-elf/lib/gcc/xtensa-lx106-elf/8.4.0/libgcc.a ")
 end
 
 return Linker

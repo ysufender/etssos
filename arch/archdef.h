@@ -1,0 +1,19 @@
+/*
+ * THIS FILE IS A PART OF THE ETSSOS PROJECT
+ * AND IS LICENSED UNDER THE MIT LICENSE
+ * 
+ * SEE (LICENSE)[/LICENSE] FOR MORE INFORMATION
+ *
+ *
+ * NAME       : arch/archdef.h
+ * DESCRIPTION: Architectural definitions for 8266
+ */
+
+#ifndef _ETSSOS_ARCH_ARCHDEF_H_
+#define _ETSSOS_ARCH_ARCHDEF_H_
+
+#define CPU_CLK_FREQ 26000000
+#define APB_CLK_FREQ CPU_CLK_FREQ
+#define TIMER_CLK_FREQ (APB_CLK_FREQ>>8)
+
+#endif /* _ETSSOS_ARCH_ARCHDEF_H_ */

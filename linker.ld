@@ -5,7 +5,7 @@ MEMORY {
 }
 
 __stack_top = ORIGIN(dram_seg) + LENGTH(dram_seg);
-ENTRY(_etssos_boot_entry);
+ENTRY(_etssos_reset_vector);
 
 SECTIONS {
 

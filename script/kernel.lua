@@ -3,18 +3,7 @@
 ---@type Efile
 local Efile = require "efile"
 
----@param source_path string
----@param options Common.Options
----@return string, string, string
-local function cc(source_path, options)
-    local output_file = "build/"..string.match(source_path, "(.+%a+.+)%.c")..".o"
-    local base_dir = "build/"..string.match(source_path, "(.+/).+%.c")
-
-    return
-        options.cc..options.cflags..source_path.." -o "..output_file,
-        output_file,
-        "mkdir -p "..base_dir
-end
+local Common = require "script.common"
 
 ---@param sub_path string
 ---@return string
@@ -33,7 +22,7 @@ local function steps(options, sources)
 
     for _, src in ipairs(sources) do
         local resolved_src = kernel(src)
-        local cmd, out, pre = cc(resolved_src, options)
+        local cmd, out, pre = Common.cc(resolved_src, options)
         table.insert(step_names, out)
 
         local step = Efile.Step

@@ -5,39 +5,34 @@
  * SEE (LICENSE)[/LICENSE] FOR MORE INFORMATION
  *
  *
- * NAME       : uart/uart.h
+ * NAME       : drivers/uart/uart.h
  * DESCRIPTION: Basic UART driver for 8266
  */
 
 #ifndef _ETSSOS_DRIVERS_UART0_H_
 #define _ETSSOS_DRIVERS_UART0_H_
 
-#include <stdint.h>
-
-#include "../gpio/gpio.h"
+#include "../../arch/archdef.h"
+#include "../common.h"
 
 #define UART0_PERI     0x60000000
-#define UART_CLK_FREQ  CPU_CLK_FREQ
 #define UART0_DATAC    128
 
-#define UART0_FIFO       (*(volatile uint32_t*)(UART0_PERI + 0x00000000))
-#define UART0_INT_RAW    (*(volatile uint32_t*)(UART0_PERI + 0x00000004))
-#define UART0_INT_STA    (*(volatile uint32_t*)(UART0_PERI + 0x00000008))
-#define UART0_INT_ENA    (*(volatile uint32_t*)(UART0_PERI + 0x0000000C))
-#define UART0_INT_CLR    (*(volatile uint32_t*)(UART0_PERI + 0x00000010))
-#define UART0_CLKDIV_REG (*(volatile uint32_t*)(UART0_PERI + 0x00000014))
-#define UART0_AUTOBAUD   (*(volatile uint32_t*)(UART0_PERI + 0x00000018))
-#define UART0_STATUS     (*(volatile uint32_t*)(UART0_PERI + 0x0000001C))
-#define UART0_CONF0      (*(volatile uint32_t*)(UART0_PERI + 0x00000020))
-#define UART0_CONF1      (*(volatile uint32_t*)(UART0_PERI + 0x00000024))
-#define UART0_LOWPULSE   (*(volatile uint32_t*)(UART0_PERI + 0x00000028))
-#define UART0_HIGHPULSE  (*(volatile uint32_t*)(UART0_PERI + 0x0000002C))
-#define UART0_RXD_CNT    (*(volatile uint32_t*)(UART0_PERI + 0x00000030))
-#define UART0_DATE       (*(volatile uint32_t*)(UART0_PERI + 0x00000034))
-#define UART0_ID         (*(volatile uint32_t*)(UART0_PERI + 0x00000038))
-
-#define backing(x) __attribute__((aligned(sizeof(x))))
-#define word_sized backing(uint32_t)
+#define UART0_FIFO      (*(volatile uint32_t*)(UART0_PERI + 0x00000000))
+#define UART0_INT_RAW   (*(volatile uint32_t*)(UART0_PERI + 0x00000004))
+#define UART0_INT_STA   (*(volatile uint32_t*)(UART0_PERI + 0x00000008))
+#define UART0_INT_ENA   (*(volatile uint32_t*)(UART0_PERI + 0x0000000C))
+#define UART0_INT_CLR   (*(volatile uint32_t*)(UART0_PERI + 0x00000010))
+#define UART0_CLKDIV    (*(volatile uint32_t*)(UART0_PERI + 0x00000014))
+#define UART0_AUTOBAUD  (*(volatile uint32_t*)(UART0_PERI + 0x00000018))
+#define UART0_STATUS    (*(volatile uint32_t*)(UART0_PERI + 0x0000001C))
+#define UART0_CONF0     (*(volatile uint32_t*)(UART0_PERI + 0x00000020))
+#define UART0_CONF1     (*(volatile uint32_t*)(UART0_PERI + 0x00000024))
+#define UART0_LOWPULSE  (*(volatile uint32_t*)(UART0_PERI + 0x00000028))
+#define UART0_HIGHPULSE (*(volatile uint32_t*)(UART0_PERI + 0x0000002C))
+#define UART0_RXD_CNT   (*(volatile uint32_t*)(UART0_PERI + 0x00000030))
+#define UART0_DATE      (*(volatile uint32_t*)(UART0_PERI + 0x00000034))
+#define UART0_ID        (*(volatile uint32_t*)(UART0_PERI + 0x00000038))
 
 typedef enum word_sized UART0_FIFO_BIT {
     UART0_FIFO_RD = 0x000000FF
@@ -92,7 +87,7 @@ typedef enum word_sized UART0_INT_CLR_BIT {
 } UART0_INT_CLR_BIT;
 
 typedef enum word_sized UART0_CLKDIV_BIT {
-    UART0_CLKDIV = 0x000FFFFF
+    UART0_CLKDIV_CLKDIV = 0x000FFFFF
 } UART0_CLKDIV_BIT;
 
 typedef enum word_sized UART0_AUTOBAUD_BIT {
@@ -150,8 +145,15 @@ typedef enum word_sized UART0_RXD_CNT_BIT {
 } UART0_RXD_CNT_BIT;
 
 
+extern volatile uint32_t UART0_CLK_FREQ; /* Initial state is undefined, call UART_Init before use. */
+
+void UART_DetectClock(void);
 void UART_Init();
-void UART_PutChar(uint8_t const); /* Returns non-zero on failure */
-void UART_PutString(char const* const); /* Returns written character count */
+void UART_PutChar(uint8_t const);
+void UART_PutString(char const* const);
+void UART_PutStringLine(char const* const);
+void UART_SetBaud(uint32_t const);
+void UART_ExhaustOutput();
+void UART_PrintFormat(char const* const, ...); /* only supports %s and %d */
 
 #endif /* _ETSSOS_DRIVERS_UART0_H_ */

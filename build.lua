@@ -25,7 +25,7 @@ local options = {
     as = "xtensa-lx106-elf-as ",
     cc = "xtensa-lx106-elf-gcc ",
     ld = "xtensa-lx106-elf-ld ",
-    cflags = "-c ",
+    cflags = "-c -O2 ",
     asflags = " ",
     ldflags = "-T linker.ld "
               .."-nostdlib -nostartfiles -nodefaultlibs ",
@@ -33,7 +33,7 @@ local options = {
     burner = "esptool ",
     board = "esp8266 ",
     port = "/dev/ttyUSB0 ",
-    baud_rate = 74880,
+    baud_rate = 9600,
     upload_rate = 115200,
 }
 
@@ -78,7 +78,7 @@ local archsrc = {
 ---@type string[]
 local driversrc = {
     "uart/uart.c",
-    "gpio/gpio.c"
+    "timer/timer.c"
 }
 
 local project = Efile.Project
@@ -121,6 +121,30 @@ project
                 .."elf2image build/bin/etssos.elf"))
 
     :multiStep(Other.upload(options))
+
+    :step(Efile.Step
+        .init("monitor", { always_run = true })
+        :dependOnStep("upload")
+        :action(function ()
+            local exec = string.format([[
+                python3 -c "
+                    import serial
+                    s = serial.Serial('%s', %d)
+                    while True:
+                        print(s.readline().decode('utf-8', errors = 'ignore'), end = '', flush = True)
+                "
+                ]], options.port:match("(.*) "), options.baud_rate)
+
+            local serial = io.popen(exec, "r")
+            if not serial then return "Failed to open serial" end
+
+            for line in serial:lines() do
+                print(line)
+            end
+
+            local _, _, code = serial:close()
+            if not code then return "Error during serial "..tostring(code) end
+        end))
 
     :step(Efile.Step
         .init("clean")
