@@ -12,6 +12,7 @@
 #define _ETSSOS_DRIVERS_GPIO_H_
 
 #include "../common.h"
+#include "../iomux.h"
 
 #define GPIO_PERI    0x60000300
 #define GPIO_PIN_CNT 16
@@ -26,7 +27,7 @@
 #define GPIO_STATUS          (*(volatile uint32_t*)(GPIO_PERI + 0x0000001C))
 #define GPIO_STATUS_W1TS     (*(volatile uint32_t*)(GPIO_PERI + 0x00000020))
 #define GPIO_STATUS_W1TC     (*(volatile uint32_t*)(GPIO_PERI + 0x00000024))
-#define GPIO_PIN(__pinnum__) (*(volatile uint32_t*)(GPIO_PERI + ((0x0000000a + __pinnum__) * 4)))
+#define GPIO_PIN(__pinnum__) (*(volatile uint32_t*)(GPIO_PERI + ((0x0000000a + (__pinnum__)) * 4)))
 #define GPIO_SIGMA_DELTA     (*(volatile uint32_t*)(GPIO_PERI + 0x00000068))
 #define GPIO_RTC_CALIB_SYNC  (*(volatile uint32_t*)(GPIO_PERI + 0x0000006C))
 #define GPIO_RTC_CALIB_VALUE (*(volatile uint32_t*)(GPIO_PERI + 0x00000070))
@@ -112,10 +113,11 @@ typedef enum backing(uint8_t) GPIO_Mode {
     GPIO_Mode_Output,
 } GPIO_Mode;
 
+#define GPIO_Read(__pinnum__) ((GPIO_IN >> (__pinnum__)) & 1)
+#define GPIO_Enable(__pinnum__, __ena__) IOMUX_SetFunc((__pinnum__), IOMUX_GPIO_FuncVector[(__pinnum__)], (__ena__))
+
 void     GPIO_Init(void);
 void     GPIO_SetMode(uint8_t const, GPIO_Mode const);
-uint16_t GPIO_Read(uint8_t const);
 void     GPIO_Write(uint8_t const, uint16_t const);
-void     GPIO_Enable(uint8_t const, uint8_t const);
 
 #endif /* _ETSSOS_DRIVERS_GPIO_H_ */

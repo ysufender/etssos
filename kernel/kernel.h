@@ -16,6 +16,8 @@
 
 void Kernel_Main(void);
 void Kernel_DumpInfo(void);
-void Kernel_Panic_Unreachable(uintptr_t const);
+void Kernel_Panic(void);
+void Kernel_Panic_Unreachable(void);
+void Kernel_Panic_Debug(void);
 
 #endif /* _ETSSOS_KERNEL_H_ */

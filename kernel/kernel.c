@@ -9,6 +9,9 @@ void Kernel_Main(void) {
     GPIO_Init();
     Timer_Init();
     UART_Init();
+
+    _etssos_interrupt_enable();
+
     UART_PutStringLine("UART Initialization successful.");
     Kernel_DumpInfo();
 
@@ -39,8 +42,17 @@ void Kernel_DumpInfo(void) {
     UART_PrintFormat("UART CLK : %u\n", UART0_CLK_FREQ);
 }
 
-void Kernel_Panic_Unreachable(uintptr_t const addr) {
-    UART_PutStringLine("Kernel reached unreachable code.");
+void __attribute__((noreturn)) Kernel_Panic(void) {
     UART_PutStringLine("Entering fault loop.");
     while (1);
+}
+
+void Kernel_Panic_Unreachable(void) {
+    UART_PutStringLine("Kernel reached unreachable code.");
+    return Kernel_Panic();
+}
+
+void Kernel_Panic_Debug(void) {
+    UART_PutStringLine("Kernel reached debug exception.");
+    return Kernel_Panic();
 }

@@ -17,10 +17,6 @@ void GPIO_SetMode(uint8_t const pin, GPIO_Mode const mode) {
     }
 }
 
-uint16_t GPIO_Read(uint8_t const pin) {
-    return (GPIO_IN >> pin) & 1;
-}
-
 void GPIO_Write(uint8_t const pin, uint16_t const val) {
     if (pin >= 6 && pin <= 11) return;
     if (val) {
@@ -28,8 +24,4 @@ void GPIO_Write(uint8_t const pin, uint16_t const val) {
     } else {
         GPIO_OUT_W1TC = (1 << pin);
     }
-}
-
-void GPIO_Enable(uint8_t const pin, uint8_t const ena) {
-    IOMUX_SetFunc(pin, IOMUX_GPIO_FuncVector[pin], 1);
 }

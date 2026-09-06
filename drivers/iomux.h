@@ -83,10 +83,10 @@
 #define IOMUX_GPIO15_FUNC_GPIO             (3)
 #define IOMUX_GPIO15_FUNC_UART0_RTS        (4)
 
-#define IOMUX_GPIO(__pinnum__) (*(volatile uint32_t*)(IOMUX_PERI + (uintptr_t)IOMUX_GPIO_GPIOVector[__pinnum__]))
+#define IOMUX_GPIO(__pinnum__) (*(volatile uint32_t*)(IOMUX_PERI + (uintptr_t)IOMUX_GPIO_GPIOVector[(__pinnum__)]))
 #define IOMUX_GPIO_SetPullup(__pinnum__, __ena__) do { \
-    if (__ena__) IOMUX_GPIO(__pinnum__) |= (1 << IOMUX_PIN_PULLUP); \
-    else         IOMUX_GPIO(__pinnum__) &= ~(1 << IOMUX_PIN_PULLUP); \
+    if ((__ena__)) IOMUX_GPIO((__pinnum__)) |= (1 << IOMUX_PIN_PULLUP); \
+    else         IOMUX_GPIO((__pinnum__)) &= ~(1 << IOMUX_PIN_PULLUP); \
 } while(0)
 
 extern uint32_t const IOMUX_GPIO_GPIOVector[16];

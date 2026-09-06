@@ -35,7 +35,10 @@ local function steps(options, sources)
             .init(out)
             :dependOnStep("base")
             :dependOnFile("script/arch.lua")
-            :dependOnFile("arch/archdef.h")
+            :dependOnFiles({
+                "arch/archdef.h",
+                "arch/interrupt.S",
+            })
             :dependOnFile(resolved_src)
             :action(cmd)
             :pre(pre))

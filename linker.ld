@@ -5,7 +5,7 @@ MEMORY {
 }
 
 __stack_top = ORIGIN(dram_seg) + LENGTH(dram_seg);
-ENTRY(_etssos_reset_vector);
+ENTRY(_etssos_boot_entry);
 
 SECTIONS {
 
@@ -26,11 +26,14 @@ SECTIONS {
 
     .text : {
         _text_start = ABSOLUTE(.);
-        KEEP(*boot.o(.text.reset_vector))
+        KEEP(*(.text.interrupt_vector))
+        . = ALIGN(0x40);
+
         *boot.o(.literal*)
         *boot.o(.text*)
         *(.literal*)
         *(.text*)
+
         _text_end = ABSOLUTE(.);
     } > iram_seg
 

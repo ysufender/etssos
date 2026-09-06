@@ -1,17 +1,15 @@
-.section .text.reset_vector
-    .global _etssos_reset_vector
-    .type _etssos_reset_vector, @function
-
-    _etssos_reset_vector:
-        j _etssos_boot_entry
+.include "arch/interrupt.S"
 
 .section .text
     .global _etssos_boot_entry
     .type _etssos_boot_entry, @function
-
     _etssos_boot_entry:
         # Stack Setup
         movi a1, __stack_top
+
+        call0 _etssos_interrupt_disable
+        movi a2, _etssos_interrupt_vector_base
+        wsr.vecbase a2
 
         # Zero BSS
         movi a2, _bss_start
@@ -23,6 +21,8 @@
             addi a2, a2, 4
             j _zero_bss
         _bss_done:
+
+        # bootrom handles the ROM -> RAM copying
 
         call0 Kernel_Main 
         call0 Kernel_Panic_Unreachable
