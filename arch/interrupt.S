@@ -1,30 +1,69 @@
+.macro SAVE_REGS
+    addi a1,  a1, -64
+    s32i a0,  a1, 0
+    s32i a2,  a1, 8
+    s32i a3,  a1, 12
+    s32i a4,  a1, 16
+    s32i a5,  a1, 20
+    s32i a6,  a1, 24
+    s32i a7,  a1, 28
+    s32i a8,  a1, 32
+    s32i a9,  a1, 36
+    s32i a10, a1, 40
+    s32i a11, a1, 44
+    s32i a12, a1, 48
+    s32i a13, a1, 52
+    s32i a14, a1, 56
+    s32i a15, a1, 60
+.endm
+
+.macro RESTORE_REGS
+    l32i a0,  a1, 0
+    l32i a2,  a1, 8
+    l32i a3,  a1, 12
+    l32i a4,  a1, 16
+    l32i a5,  a1, 20
+    l32i a6,  a1, 24
+    l32i a7,  a1, 28
+    l32i a8,  a1, 32
+    l32i a9,  a1, 36
+    l32i a10, a1, 40
+    l32i a11, a1, 44
+    l32i a12, a1, 48
+    l32i a13, a1, 52
+    l32i a14, a1, 56
+    l32i a15, a1, 60
+    addi a1,  a1, 64
+.endm
+
 .section .text.interrupt_vector
     .global _etssos_interrupt_vector_base
     _etssos_interrupt_vector_base:
+
         .org _etssos_interrupt_vector_base + 0x10
         .type DebugException, @function
         DebugException:
-            j Kernel_Panic_Debug
+            j Kernel_Kernel_Panic_Debug
 
         .org _etssos_interrupt_vector_base + 0x20
         .type NMIException, @function
         NMIException:
-            call0 Kernel_Panic_NonMaskable 
+            call0 Kernel_Kernel_Panic_NonMaskable 
 
         .org _etssos_interrupt_vector_base  + 0x30
         .type KernelException, @function
         KernelException:
-            j Kernel_Panic
+            j _etssos_interrupt_kernel
 
         .org _etssos_interrupt_vector_base  + 0x50
         .type UserException, @function
         UserException:
-            j Kernel_Panic_UserError
+            j Kernel_Kernel_Panic_UserError
 
         .org _etssos_interrupt_vector_base  + 0x70
         .type DoubleException, @function
         DoubleException:
-            j Kernel_Panic_Double
+            j Kernel_Kernel_Panic_Double
 
         .org _etssos_interrupt_vector_base  + 0x80
         .type Reset, @function
@@ -33,8 +72,13 @@
             j _etssos_boot_entry
 
 .section .text
-    .type _etssos_interrupt_common, @function
-    _etssos_interrupt_common:
+    .align 4
+    .type _etssos_interrupt_kernel, @function
+    _etssos_interrupt_kernel:
+        SAVE_REGS
+        j Kernel_Kernel_Panic
+        RESTORE_REGS
+        rfe
 
     .type _etssos_reset, @function
     _etssos_reset:
@@ -55,6 +99,7 @@
         movi a15, 0
         ret.n
 
+    .align 4
     .global _etssos_interrupt_enable
     .type _etssos_interrupt_enable, @function
     _etssos_interrupt_enable:
@@ -63,6 +108,7 @@
         rsync
         ret.n
 
+    .align 4
     .global _etssos_interrupt_disable
     .type _etssos_interrupt_disable, @function
     _etssos_interrupt_disable:

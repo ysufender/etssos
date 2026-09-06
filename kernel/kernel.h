@@ -14,10 +14,10 @@
 
 #include <stdint.h>
 
-void Kernel_Main(void);
-void Kernel_DumpInfo(void);
-void Kernel_Panic(void);
-void Kernel_Panic_Unreachable(void);
-void Kernel_Panic_Debug(void);
+void Kernel_Kernel_Main(void);
+void Kernel_Kernel_DumpInfo(void);
+void Kernel_Kernel_Panic(void);
+void Kernel_Kernel_Panic_Unreachable(void);
+void Kernel_Kernel_Panic_Debug(void);
 
 #endif /* _ETSSOS_KERNEL_H_ */

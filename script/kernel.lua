@@ -7,9 +7,11 @@ local Common = require "script.common"
 
 local sources = {
     "kernel.c",
+    "interrupt.c"
 }
 
 local other = {
+    "kernel/interrupt.h",
     "kernel/kernel.h",
     "script/kernel.lua"
 }

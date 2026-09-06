@@ -1,12 +1,13 @@
 #include "kernel.h"
 
+#include "interrupt.h"
 #include "../drivers/gpio/gpio.h"
 #include "../drivers/uart/uart.h"
 #include "../drivers/timer/timer.h"
 #include "../config/etssos_config.h"
 
 static char const _reserved_[] = "RESERVED";
-static char const* const Kernel_Panic_CauseStrings[] = {
+static char const* const Kernel_Kernel_Panic_CauseStrings[] = {
     "IllegalInstruction",
     "Syscall",
     "InstructionFetchError",
@@ -49,7 +50,7 @@ static char const* const Kernel_Panic_CauseStrings[] = {
     "Coprocessor7Disabled",
 };
 
-void Kernel_Main(void) {
+void Kernel_Kernel_Main(void) {
     Drivers_GPIO_Init();
     Drivers_Timer_Init();
     Drivers_UART_Init();
@@ -57,10 +58,10 @@ void Kernel_Main(void) {
     _etssos_interrupt_enable();
 
     Drivers_UART_PutStringLine("UART Initialization successful.");
-    Kernel_DumpInfo();
+    Kernel_Kernel_DumpInfo();
 }
 
-void Kernel_DumpInfo(void) {
+void Kernel_Kernel_DumpInfo(void) {
     Drivers_UART_PutStringLine("Kernel Info:");
     Drivers_UART_PrintFormat("Name     : %s\n", ETSSOS_NAME);
     Drivers_UART_PrintFormat("Version  : %s\n", ETSSOS_VERSION);
@@ -76,8 +77,9 @@ void Kernel_DumpInfo(void) {
     Drivers_UART_PrintFormat("UART CLK : %u\n", DRIVERS_UART0_CLK_FREQ);
 }
 
-void __attribute__((noreturn)) Kernel_Panic(void) {
-    uint32_t cause, addr;
+void __attribute__((noreturn)) Kernel_Kernel_Panic_Dump() {
+    uint8_t  cause;
+    uint32_t addr;
 
     __asm__ volatile (
             "rsr.exccause %0\n"
@@ -85,32 +87,59 @@ void __attribute__((noreturn)) Kernel_Panic(void) {
             : "=a" (cause), "=a" (addr));
 
     Drivers_UART_PrintFormat("Address: %u\n", addr);
-    Drivers_UART_PrintFormat("Cause: %s\n", cause < 30 ? Kernel_Panic_CauseStrings[cause] : _reserved_);
+    Drivers_UART_PrintFormat("Cause: %s\n", cause < 30
+                                            ? Kernel_Kernel_Panic_CauseStrings[cause]
+                                            : _reserved_);
     Drivers_UART_PutStringLine("Entering fault loop.");
+
     while (1);
 }
 
-void Kernel_Panic_Unreachable(void) {
+void Kernel_Kernel_Panic(void) {
+    uint8_t cause;
+    __asm__ volatile (
+            "rsr.exccause %0"
+            : "=a" (cause));
+
+    if (cause & KERNEL_INTERRUPT_LEVEL1INTERRUPT) {
+        Kernel_Interrupt_Dispatch();
+    }
+    else {
+        Kernel_Kernel_Panic_Dump();
+    }
+}
+
+void Kernel_Kernel_Panic_Unreachable(void) {
     Drivers_UART_PutStringLine("Kernel reached unreachable code.");
-    return Kernel_Panic();
+    while (1);
 }
 
-void Kernel_Panic_Debug(void) {
+void Kernel_Kernel_Panic_Debug(void) {
     Drivers_UART_PutStringLine("Kernel reached debug exception.");
-    return Kernel_Panic();
+    Kernel_Kernel_Panic_Dump();
 }
 
-void Kernel_Panic_NonMaskable(void) {
+void Kernel_Kernel_Panic_NonMaskable(void) {
     Drivers_UART_PutStringLine("Kernel reached a non-maskable interrupt.");
-    return Kernel_Panic();
+    Kernel_Kernel_Panic_Dump();
 }
 
-void Kernel_Panic_UserError(void) {
-    Drivers_UART_PutStringLine("Panic in userspace code.");
-    return Kernel_Panic();
+void Kernel_Kernel_Panic_UserError(void) {
+    uint8_t cause;
+    __asm__ volatile (
+            "rsr.exccause %0"
+            : "=a" (cause));
+
+    if (cause & KERNEL_INTERRUPT_LEVEL1INTERRUPT) {
+        Kernel_Interrupt_Dispatch();
+    }
+    else {
+        Drivers_UART_PutStringLine("Panic in userspace code.");
+        Kernel_Kernel_Panic_Dump();
+    }
 }
 
-void Kernel_Panic_Double(void) {
+void Kernel_Kernel_Panic_Double(void) {
     Drivers_UART_PutStringLine("Double panic.");
 
     uint32_t addr;
@@ -120,5 +149,5 @@ void Kernel_Panic_Double(void) {
             : "=a" (addr));
 
     Drivers_UART_PrintFormat("Most Recent Addr: %u\n", addr);
-    return Kernel_Panic();
+    Kernel_Kernel_Panic_Dump();
 }

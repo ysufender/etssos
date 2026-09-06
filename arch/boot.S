@@ -24,5 +24,5 @@
 
         # bootrom handles the ROM -> RAM copying
 
-        call0 Kernel_Main 
-        call0 Kernel_Panic_Unreachable
+        call0 Kernel_Kernel_Main 
+        call0 Kernel_Kernel_Panic_Unreachable
