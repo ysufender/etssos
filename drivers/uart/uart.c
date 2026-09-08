@@ -2,8 +2,7 @@
 
 #include "uart.h"
 #include "../../config/etssos_config.h"
-
-volatile uint32_t DRIVERS_UART0_CLK_FREQ;
+#include "../timer/timer.h"
 
 void Drivers_UART_Init(void) {
     Drivers_UART_SetBaud(ETSSOS_BAUD);
@@ -22,7 +21,7 @@ void Drivers_UART_Init(void) {
 
 void Drivers_UART_SetBaud(uint32_t const baud) {
     Drivers_UART_ExhaustOutput();
-    DRIVERS_UART0_CLKDIV = DRIVERS_UART0_CLK_FREQ / baud;
+    DRIVERS_UART0_CLKDIV = DRIVERS_TIMER_CLK_FREQ / baud;
 }
 
 void Drivers_UART_ExhaustOutput(void) {
@@ -120,6 +119,7 @@ void Drivers_UART_PrintFormat(char const* const fmt, ...) {
                     escaping = 0;
                     break;
                 }
+                __attribute__((fallthrough));
             
             case 'd':
                 if (escaping) {
@@ -129,6 +129,7 @@ void Drivers_UART_PrintFormat(char const* const fmt, ...) {
                     escaping = 0;
                     break;
                 }
+                __attribute__((fallthrough));
 
             case 's':
                 if (escaping) {
@@ -137,6 +138,7 @@ void Drivers_UART_PrintFormat(char const* const fmt, ...) {
                     escaping = 0;
                     break;
                 }
+                __attribute__((fallthrough));
 
             case 'x':
                 if (escaping) {
@@ -145,6 +147,7 @@ void Drivers_UART_PrintFormat(char const* const fmt, ...) {
                     escaping = 0;
                     break;
                 }
+                __attribute__((fallthrough));
 
             default:
                 Drivers_UART_PutChar(fmt[i]);

@@ -14,6 +14,8 @@
 
 #include <stdint.h>
 
+#define DPORT0_PERI (*(volatile uint32_t*)(0x3FF00014))
+
 extern char const* const Kernel_Kernel_Panic_CauseStrings[40];
 
 void Kernel_Kernel_Main(void);

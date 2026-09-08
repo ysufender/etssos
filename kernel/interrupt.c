@@ -1,8 +1,6 @@
 #include "interrupt.h"
 
-#include "../drivers/uart/uart.h"
-#include "../drivers/timer/timer.h"
-#include "../drivers/gpio/gpio.h"
+#include "timer.h"
 
 Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT] = { 0 };
 
@@ -25,8 +23,8 @@ void Kernel_Interrupt_Software_Dispatch(void) {
 }
 
 void Kernel_Interrupt_Init(void) {
-    Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1, Drivers_Timer_FRC1_Interrupt_Handler);
-    Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_TIMER_FRC2, Drivers_Timer_FRC2_Interrupt_Handler);
+    Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1, Kernel_Timer_FRC1_Interrupt_Handler);
+    Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_TIMER_FRC2, Kernel_Timer_FRC2_Interrupt_Handler);
     Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_SOFT, Kernel_Interrupt_Software_Dispatch);
 
     Kernel_Interrupt_Activate(
@@ -42,6 +40,9 @@ void Kernel_Interrupt_Init(void) {
         | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC1)
         | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC2)
     );
+
+    /* NonosSDK had this */
+    DPORT0_EDGE_INT_ENA |= (1 << 1);
 
     __asm__ volatile (
         "rsil a2, 0"

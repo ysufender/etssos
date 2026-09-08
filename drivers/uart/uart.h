@@ -144,7 +144,6 @@ typedef enum word_sized DRIVERS_UART0_RXD_CNT_BIT {
     DRIVERS_UART0_RXD_CNT_EDGE_CNT = 0x000003FF,
 } DRIVERS_UART0_RXD_CNT_BIT;
 
-
 void Drivers_UART_DetectClock(void);
 void Drivers_UART_Init();
 void Drivers_UART_PutChar(uint8_t const);

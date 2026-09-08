@@ -14,6 +14,8 @@
 
 #include "../drivers/common.h"
 
+#define DPORT0_EDGE_INT_ENA (*(volatile uint32_t*)(0x3FF00004))
+
 typedef enum backing(uint8_t) KERNEL_INTERRUPT_TYPE {
     KERNEL_INTERRUPT_ILLEGALINSTRUCTION,
     KERNEL_INTERRUPT_SYSCALL,

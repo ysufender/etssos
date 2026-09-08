@@ -3,25 +3,14 @@
 #include "kernel.h"
 
 #include "interrupt.h"
-#include "../drivers/gpio/gpio.h"
-#include "../drivers/uart/uart.h"
-#include "../drivers/timer/timer.h"
+#include "timer.h"
 #include "../config/etssos_config.h"
 
 #define noreturn __attribute__((noreturn))
 
 void Kernel_Kernel_Main(void) {
-    Drivers_GPIO_Init();
-    Drivers_UART_Init();
-
-    Drivers_GPIO_Enable(5, 1);
-    Drivers_GPIO_SetMode(5, DRIVERS_GPIO_MODE_OUTPUT);
-
-    Kernel_Kernel_DumpInfo();
-    // Kernel_Interrupt_Init();
-    // Drivers_Timer_Init();
-
-    while (1) { }
+    Kernel_Timer_Init();
+    while (1);
 }
 
 void Kernel_Kernel_DumpInfo(void) {
@@ -37,7 +26,7 @@ void Kernel_Kernel_DumpInfo(void) {
     Drivers_UART_PrintFormat("Burner   : %s\n", ETSSOS_BURNER);
     Drivers_UART_PrintFormat("BAUD     : %u\n", ETSSOS_BAUD);
     Drivers_UART_PrintFormat("Board    : %s\n", ETSSOS_BOARD);
-    Drivers_UART_PrintFormat("UART CLK : %u\n", DRIVERS_UART0_CLK_FREQ);
+    Drivers_UART_PrintFormat("UART CLK : %u\n", DRIVERS_TIMER_CLK_FREQ);
 }
 
 void noreturn Kernel_Kernel_Panic_Dump() {
@@ -88,7 +77,6 @@ void noreturn Kernel_Kernel_Panic_NonMaskable(void) {
 }
 
 void Kernel_Kernel_Panic_UserError(void) {
-    Drivers_GPIO_Write(5, 1);
     uint32_t cause;
     __asm__ volatile (
         "rsr.exccause %0"
