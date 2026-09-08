@@ -62,9 +62,16 @@ typedef enum word_sized DRIVERS_TIMER_FRC2_INT_ADDR_BIT {
     DRIVERS_TIMER_FRC2_INT_ADDR_CLR  = 0x00000001,
 } DRIVERS_TIMER_FRC2_INT_ADDR_BIT;
 
-#define DRIVERS_TIMER_PRESCALE_DIVIDER  16
+#define DRIVERS_TIMER_PRESCALE_DIVIDER  1
 #define DRIVERS_TIMER_MS_TO_TICK_SCALAR (CPU_CLK_FREQ / DRIVERS_TIMER_PRESCALE_DIVIDER)
 
+#define DRIVERS_TIMER_FRC1_INTERVAL_TICKS ((uint32_t)DRIVERS_TIMER_MS_TO_TICK_SCALAR * 1000)
+#define DRIVERS_TIMER_FRC2_INTERVAL_TICKS ((uint32_t)DRIVERS_TIMER_MS_TO_TICK_SCALAR * 1000)
+
+extern volatile uint32_t DRIVERS_UART0_CLK_FREQ; /* Initial state is undefined, call UART_Init before use. */
+
 void Drivers_Timer_Init(void);
+void Drivers_Timer_FRC1_Interrupt_Handler(void);
+void Drivers_Timer_FRC2_Interrupt_Handler(void);
 
 #endif /* _ETSSOS_DRIVERS_TIMER_H_ */

@@ -127,7 +127,8 @@ static inline uint32_t Kernel_Interrupt_Deactivate(uint32_t const mask) {
         "rsr.intenable %0\n"
         : "=a" (intenable));
     __asm__ volatile (
-        "wsr.intenable %0"
+        "wsr.intenable %0\n"
+        "rsync"
         :
         : "a" (intenable & ~mask));
     Kernel_Interrupt_Restore(old);
@@ -137,16 +138,17 @@ static inline uint32_t Kernel_Interrupt_Deactivate(uint32_t const mask) {
 static inline uint32_t Kernel_Interrupt_Read(void) {
     uint32_t interrupts;
     __asm__ volatile (
-        "rsr.interrupts %0"
+        "rsr.interrupt %0"
         : "=a" (interrupts));
     return interrupts;
 }
 
-#define Kernel_Interrupt_Clear(__mask__) \
+#define Kernel_Interrupt_Clear(__src__) do { \
     __asm__ volatile ( \
         "wsr.intclear %0\n" \
         "rsync" \
         : \
-        : "a" (__mask__))
+        : "a" (1 << __src__)); \
+} while (0)
 
 #endif /* _ETSSOS_KERNEL_INTERRUPT_H_ */

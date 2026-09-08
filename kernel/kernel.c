@@ -1,3 +1,5 @@
+#include <stdarg.h>
+
 #include "kernel.h"
 
 #include "interrupt.h"
@@ -9,16 +11,17 @@
 #define noreturn __attribute__((noreturn))
 
 void Kernel_Kernel_Main(void) {
-    Kernel_Interrupt_Init();
-
     Drivers_GPIO_Init();
     Drivers_UART_Init();
-    Drivers_Timer_Init();
 
-    // Kernel_Kernel_DumpInfo();
-    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_SOFT);
+    Drivers_GPIO_Enable(5, 1);
+    Drivers_GPIO_SetMode(5, DRIVERS_GPIO_MODE_OUTPUT);
 
-    while (1);
+    Kernel_Kernel_DumpInfo();
+    // Kernel_Interrupt_Init();
+    // Drivers_Timer_Init();
+
+    while (1) { }
 }
 
 void Kernel_Kernel_DumpInfo(void) {
@@ -85,6 +88,7 @@ void noreturn Kernel_Kernel_Panic_NonMaskable(void) {
 }
 
 void Kernel_Kernel_Panic_UserError(void) {
+    Drivers_GPIO_Write(5, 1);
     uint32_t cause;
     __asm__ volatile (
         "rsr.exccause %0"

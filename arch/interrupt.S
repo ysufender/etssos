@@ -1,8 +1,6 @@
 .macro m_save_registers
-    addi a1, a1, -64
+    addi a1, a1, -52
     s32i a0,  a1, 0
-    s32i a2,  a1, 8
-    s32i a3,  a1, 12
     s32i a4,  a1, 16
     s32i a5,  a1, 20
     s32i a6,  a1, 24
@@ -19,21 +17,19 @@
 
 .macro m_restore_registers
     l32i a0,  a1, 0
-    l32i a2,  a1, 8
-    l32i a3,  a1, 12
-    l32i a4,  a1, 16
-    l32i a5,  a1, 20
-    l32i a6,  a1, 24
-    l32i a7,  a1, 28
-    l32i a8,  a1, 32
-    l32i a9,  a1, 36
-    l32i a10, a1, 40
-    l32i a11, a1, 44
-    l32i a12, a1, 48
-    l32i a13, a1, 52
-    l32i a14, a1, 56
-    l32i a15, a1, 60
-    addi a1,  a1, 64
+    l32i a4,  a1, 4
+    l32i a5,  a1, 8
+    l32i a6,  a1, 12
+    l32i a7,  a1, 16
+    l32i a8,  a1, 20
+    l32i a9,  a1, 24
+    l32i a10, a1, 28
+    l32i a11, a1, 32
+    l32i a12, a1, 36
+    l32i a13, a1, 40
+    l32i a14, a1, 44
+    l32i a15, a1, 48
+    addi a1,  a1, 52
 .endm
 
 .section .text.interrupt_vector
@@ -50,22 +46,22 @@
         NMIException:
             j Kernel_Kernel_Panic_NonMaskable 
 
-        .org _etssos_interrupt_vector_base  + 0x30
+        .org _etssos_interrupt_vector_base + 0x30
         .type KernelException, @function
         KernelException:
             j _etssos_kernel_interrupt_entry
 
-        .org _etssos_interrupt_vector_base  + 0x50
+        .org _etssos_interrupt_vector_base + 0x50
         .type UserException, @function
         UserException:
             j _etssos_user_interrupt_entry
 
-        .org _etssos_interrupt_vector_base  + 0x70
+        .org _etssos_interrupt_vector_base + 0x70
         .type DoubleException, @function
         DoubleException:
             j Kernel_Kernel_Panic_Double
 
-        .org _etssos_interrupt_vector_base  + 0x80
+        .org _etssos_interrupt_vector_base + 0x80
         .type Reset, @function
         Reset:
             j _etssos_reset
@@ -73,6 +69,8 @@
             j _etssos_boot_entry
 
 .section .text
+    # a2 is used for return value
+
     .align 4
     .global _etssos_kernel_interrupt_entry
     .type _etssos_kernel_interrupt_entry, @function

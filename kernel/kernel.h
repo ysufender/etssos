@@ -18,5 +18,6 @@ extern char const* const Kernel_Kernel_Panic_CauseStrings[40];
 
 void Kernel_Kernel_Main(void);
 void Kernel_Kernel_DumpInfo(void);
+void Kernel_Kernel_Syscall(uint32_t const, ...);
 
 #endif /* _ETSSOS_KERNEL_H_ */

@@ -145,8 +145,6 @@ typedef enum word_sized DRIVERS_UART0_RXD_CNT_BIT {
 } DRIVERS_UART0_RXD_CNT_BIT;
 
 
-extern volatile uint32_t DRIVERS_UART0_CLK_FREQ; /* Initial state is undefined, call UART_Init before use. */
-
 void Drivers_UART_DetectClock(void);
 void Drivers_UART_Init();
 void Drivers_UART_PutChar(uint8_t const);

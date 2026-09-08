@@ -5,13 +5,7 @@
 
 volatile uint32_t DRIVERS_UART0_CLK_FREQ;
 
-void Drivers_UART_DetectClock(void) {
-    uint32_t const div = DRIVERS_UART0_CLKDIV & 0x000FFFFF;
-    *(uint32_t*)(&DRIVERS_UART0_CLK_FREQ) = 74880 * div;
-}
-
 void Drivers_UART_Init(void) {
-    Drivers_UART_DetectClock();
     Drivers_UART_SetBaud(ETSSOS_BAUD);
 
     DRIVERS_UART0_CONF0 = (3 << 2) /* 8-bit bit num */
