@@ -4,12 +4,12 @@
     .global _etssos_boot_entry
     .type _etssos_boot_entry, @function
     _etssos_boot_entry:
-        # Stack Setup
-        movi a1, __stack_top
-
-        call0 _etssos_interrupt_disable
         movi a2, _etssos_interrupt_vector_base
         wsr.vecbase a2
+        rsync
+
+        # Stack Setup
+        movi a1, __stack_top
 
         # Zero BSS
         movi a2, _bss_start
@@ -24,5 +24,4 @@
 
         # bootrom handles the ROM -> RAM copying
 
-        call0 Kernel_Kernel_Main 
-        call0 Kernel_Kernel_Panic_Unreachable
+        j Kernel_Kernel_Main 

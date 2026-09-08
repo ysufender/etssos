@@ -141,6 +141,7 @@ project
             print("targets:")
             print("    all")
             print("    arch")
+            print("    drivers")
             print("    kernel")
             print("    link")
             print("    help")

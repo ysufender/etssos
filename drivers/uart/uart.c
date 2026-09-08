@@ -1,7 +1,6 @@
 #include <stdarg.h>
 
 #include "uart.h"
-#include "../timer/timer.h"
 #include "../../config/etssos_config.h"
 
 volatile uint32_t DRIVERS_UART0_CLK_FREQ;
@@ -13,7 +12,6 @@ void Drivers_UART_DetectClock(void) {
 
 void Drivers_UART_Init(void) {
     Drivers_UART_DetectClock();
-    Drivers_Timer_Delay(1000);
     Drivers_UART_SetBaud(ETSSOS_BAUD);
 
     DRIVERS_UART0_CONF0 = (3 << 2) /* 8-bit bit num */
@@ -24,6 +22,8 @@ void Drivers_UART_Init(void) {
 
     DRIVERS_UART0_CONF0 &= ~(1 << 17) /* Reset RX FIFO */
                   & ~(1 << 18); /* Reset TX FIFO */
+
+    Drivers_UART_PutStringLine("UART Initialization successful.");
 }
 
 void Drivers_UART_SetBaud(uint32_t const baud) {
@@ -59,6 +59,11 @@ void Drivers_UART_printInt(uint32_t const num) {
         digitCount = digitCount + 1;
     }
 
+    if (digitCount == 0) {
+        Drivers_UART_PutChar('0');
+        return;
+    }
+
     char result[11];
 
     tmp = num;
@@ -71,6 +76,32 @@ void Drivers_UART_printInt(uint32_t const num) {
     result[digitCount] = '\0';
 
     Drivers_UART_PutString(result);
+}
+
+void Drivers_UART_printHexDigit(uint8_t const hex) {
+    uint8_t const low  = hex & 0x0F,
+                  high = (hex & 0xF0) >> 4;
+
+    char const hchar = (high >= 10)
+                     ? 'A' + (high - 10)
+                     : '0' + high,
+               lchar = (low>= 10)
+                     ? 'A' + (low- 10)
+                     : '0' + low;
+    
+    Drivers_UART_PutChar(hchar);
+    Drivers_UART_PutChar(lchar);
+}
+
+void Drivers_UART_printHex(uint32_t const num) {
+    Drivers_UART_PutString("0x");
+
+    uint8_t const* const bytes = (uint8_t*)&num;
+
+    Drivers_UART_printHexDigit(bytes[0]);
+    Drivers_UART_printHexDigit(bytes[1]);
+    Drivers_UART_printHexDigit(bytes[2]);
+    Drivers_UART_printHexDigit(bytes[3]);
 }
 
 void Drivers_UART_PrintFormat(char const* const fmt, ...) {
@@ -109,6 +140,14 @@ void Drivers_UART_PrintFormat(char const* const fmt, ...) {
                 if (escaping) {
                     char const* const str = va_arg(args, char const*);
                     Drivers_UART_PutString(str);
+                    escaping = 0;
+                    break;
+                }
+
+            case 'x':
+                if (escaping) {
+                    uint32_t const integer = va_arg(args, uint32_t);
+                    Drivers_UART_printHex(integer);
                     escaping = 0;
                     break;
                 }

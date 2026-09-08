@@ -1,26 +1,37 @@
 #include "interrupt.h"
 
-static Kernel_Interrupt_Handler Kernel_Interrupt_Handler_Table[KERNEL_INTERRUPT_COUNT + 1] = { 0 };
+#include "../drivers/uart/uart.h"
 
-#define Kernel_Interrupt_Count (sizeof(Kernel_Interrupt_Handler_Table) / sizeof(Kernel_Interrupt_Handler)) 
+Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT] = { 0 };
 
-void Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE const src, Kernel_Interrupt_Handler const handler) {
-    if (src >= Kernel_Interrupt_Count) {
-        return;
-    }
-
-    Kernel_Interrupt_Handler_Table[src] = handler;
+void Kernel_Interrupt_Dispatch_Software(void) {
+    Drivers_UART_PutStringLine("YAY!");
 }
 
 void Kernel_Interrupt_Dispatch(void) {
-    uint16_t pending;
-    __asm__ volatile (
-            "rsr.interrupt %0"
-            : "=a" (pending));
+    Kernel_Interrupt_Clear(0xFFFFFFFF);
+    Drivers_UART_PutStringLine("WAYY!");
+}
 
-    for (uint8_t i = 0; i < Kernel_Interrupt_Count; i++) {
-        if (pending & (1 << i)) {
-            Kernel_Interrupt_Handler_Table[i]();
-        }
-    }
+void Kernel_Interrupt_Init(void) {
+    Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE_SOFT, Kernel_Interrupt_Dispatch_Software);
+    Kernel_Interrupt_Activate(
+        ( 1 << KERNEL_INTERRUPT_SOURCE_WDEV_FIQ)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_SLC)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_SPI)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_RTC)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_GPIO)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_UART)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_TICK)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_SOFT)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_WDT)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC1)
+        | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC2)
+    );
+
+    __asm__ volatile (
+        "rsil a2, 0"
+        :
+        :
+        : "a2");
 }

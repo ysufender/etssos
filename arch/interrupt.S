@@ -1,5 +1,5 @@
-.macro SAVE_REGS
-    addi a1,  a1, -64
+.macro m_save_registers
+    addi a1, a1, -64
     s32i a0,  a1, 0
     s32i a2,  a1, 8
     s32i a3,  a1, 12
@@ -17,7 +17,7 @@
     s32i a15, a1, 60
 .endm
 
-.macro RESTORE_REGS
+.macro m_restore_registers
     l32i a0,  a1, 0
     l32i a2,  a1, 8
     l32i a3,  a1, 12
@@ -48,17 +48,17 @@
         .org _etssos_interrupt_vector_base + 0x20
         .type NMIException, @function
         NMIException:
-            call0 Kernel_Kernel_Panic_NonMaskable 
+            j Kernel_Kernel_Panic_NonMaskable 
 
         .org _etssos_interrupt_vector_base  + 0x30
         .type KernelException, @function
         KernelException:
-            j _etssos_interrupt_kernel
+            j _etssos_kernel_interrupt_entry
 
         .org _etssos_interrupt_vector_base  + 0x50
         .type UserException, @function
         UserException:
-            j Kernel_Kernel_Panic_UserError
+            j _etssos_user_interrupt_entry
 
         .org _etssos_interrupt_vector_base  + 0x70
         .type DoubleException, @function
@@ -68,21 +68,31 @@
         .org _etssos_interrupt_vector_base  + 0x80
         .type Reset, @function
         Reset:
-            call0 _etssos_reset
+            j _etssos_reset
+            _etssos_reset_cnt:
             j _etssos_boot_entry
 
 .section .text
     .align 4
-    .type _etssos_interrupt_kernel, @function
-    _etssos_interrupt_kernel:
-        SAVE_REGS
-        j Kernel_Kernel_Panic
-        RESTORE_REGS
+    .global _etssos_kernel_interrupt_entry
+    .type _etssos_kernel_interrupt_entry, @function
+    _etssos_kernel_interrupt_entry:
+        m_save_registers
+        call0 Kernel_Kernel_Panic
+        m_restore_registers
+        rfe
+
+    .align 4
+    .global _etssos_user_interrupt_entry
+    .type _etssos_user_interrupt_entry, @function
+    _etssos_user_interrupt_entry:
+        m_save_registers
+        call0 Kernel_Kernel_Panic_UserError
+        m_restore_registers
         rfe
 
     .type _etssos_reset, @function
     _etssos_reset:
-        movi a1, 0
         movi a2, 0
         movi a3, 0
         movi a4, 0
@@ -97,20 +107,4 @@
         movi a13, 0
         movi a14, 0
         movi a15, 0
-        ret.n
-
-    .align 4
-    .global _etssos_interrupt_enable
-    .type _etssos_interrupt_enable, @function
-    _etssos_interrupt_enable:
-        movi a2, 0x00000000
-        wsr a2, PS
-        rsync
-        ret.n
-
-    .align 4
-    .global _etssos_interrupt_disable
-    .type _etssos_interrupt_disable, @function
-    _etssos_interrupt_disable:
-        rsil a2, 15
-        ret.n
+        j _etssos_reset_cnt

@@ -12,11 +12,8 @@
 #ifndef _ETSSOS_ARCH_ARCHDEF_H_
 #define _ETSSOS_ARCH_ARCHDEF_H_
 
-#define CPU_CLK_FREQ 26000000
+#define CPU_CLK_FREQ 80000000
 #define APB_CLK_FREQ CPU_CLK_FREQ
 #define TIMER_CLK_FREQ (APB_CLK_FREQ>>8)
-
-void _etssos_interrupt_enable(void);
-void _etssos_interrupt_disable(void);
 
 #endif /* _ETSSOS_ARCH_ARCHDEF_H_ */

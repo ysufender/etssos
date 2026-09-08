@@ -1,11 +1,14 @@
 #include "gpio.h"
 
 #include "../iomux.h"
+#include "../uart/uart.h"
 
 void Drivers_GPIO_Init(void) {
     for (uint8_t pin = 0; pin < DRIVERS_GPIO_PIN_CNT; pin++) {
         Drivers_IOMUX_GPIO_SetPullup(pin, 1);
     }
+
+    Drivers_UART_PutStringLine("GPIO Initialization successful.");
 }
 
 void Drivers_GPIO_SetMode(uint8_t const pin, DRIVERS_GPIO_MODE const mode) {

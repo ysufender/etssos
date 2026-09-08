@@ -114,7 +114,7 @@ typedef enum backing(uint8_t) DRIVERS_GPIO_MODE {
 } DRIVERS_GPIO_MODE;
 
 #define Drivers_GPIO_Read(__pinnum__) ((GPIO_IN >> (__pinnum__)) & 1)
-#define Drivers_GPIO_Enable(__pinnum__, __ena__) IOMUX_SetFunc((__pinnum__), IOMUX_GPIO_FuncVector[(__pinnum__)], (__ena__))
+#define Drivers_GPIO_Enable(__pinnum__, __ena__) Drivers_IOMUX_SetFunc((__pinnum__), Drivers_IOMUX_GPIO_FuncVector[(__pinnum__)], (__ena__))
 
 void     Drivers_GPIO_Init(void);
 void     Drivers_GPIO_SetMode(uint8_t const, DRIVERS_GPIO_MODE const);

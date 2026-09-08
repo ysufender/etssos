@@ -57,24 +57,96 @@ typedef enum backing(uint8_t) KERNEL_INTERRUPT_TYPE {
     KERNEL_INTERRUPT_COPROCESSOR7DISABLED,
 } KERNEL_INTERRUPT_TYPE;
 
+#define KERNEL_INTERRUPT_COUNT 11
+
 typedef enum backing(uint8_t) KERNEL_INTERRUPT_SOURCE {
-    KERNEL_INTERRUPT_WDEV_FIQ    = 0,
-    KERNEL_INTERRUPT_SLC         = 1,
-    KERNEL_INTERRUPT_SPI         = 2,
-    KERNEL_INTERRUPT_RTC         = 3,
-    KERNEL_INTERRUPT_GPIO        = 4,
-    KERNEL_INTERRUPT_UART        = 5,
-    KERNEL_INTERRUPT_TICK        = 6,
-    KERNEL_INTERRUPT_SOFT        = 7,
-    KERNEL_INTERRUPT_WDT         = 8,
-    KERNEL_INTERRUPT_TIMER_FRC1  = 9,
-    KERNEL_INTERRUPT_TIMER_FRC2  = 10,
-    KERNEL_INTERRUPT_COUNT       = 11,
+    KERNEL_INTERRUPT_SOURCE_WDEV_FIQ    = 0,
+    KERNEL_INTERRUPT_SOURCE_SLC         = 1,
+    KERNEL_INTERRUPT_SOURCE_SPI         = 2,
+    KERNEL_INTERRUPT_SOURCE_RTC         = 3,
+    KERNEL_INTERRUPT_SOURCE_GPIO        = 4,
+    KERNEL_INTERRUPT_SOURCE_UART        = 5,
+    KERNEL_INTERRUPT_SOURCE_TICK        = 6,
+    KERNEL_INTERRUPT_SOURCE_SOFT        = 7,
+    KERNEL_INTERRUPT_SOURCE_WDT         = 8,
+    KERNEL_INTERRUPT_SOURCE_TIMER_FRC1  = 9,
+    KERNEL_INTERRUPT_SOURCE_TIMER_FRC2  = 10,
 } KERNEL_INTERRUPT_SOURCE;
 
-typedef void (*Kernel_Interrupt_Handler)(void);
+typedef void (*Kernel_Interrupt_Handler)();
 
-void Kernel_Interrupt_Register(KERNEL_INTERRUPT_SOURCE const, Kernel_Interrupt_Handler const);
+void Kernel_Interrupt_Init(void);
 void Kernel_Interrupt_Dispatch(void);
+
+extern Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT];
+#define Kernel_Interrupt_Register(__src__, __handler__) Kernel_Interrupt_RegistrationVector[__src__] = __handler__
+
+#define Kernel_Interrupt_Trigger(__src__) do {\
+    __asm__ volatile ( \
+        "wsr.intset %0\n" \
+        "rsync\n" \
+        : \
+        : "a" (1 << __src__) \
+    ); \
+} while (0)
+
+static inline uint32_t Kernel_Interrupt_Disable(void) {
+    uint32_t old;
+    __asm__ volatile (
+        "rsil %0, 2"
+        : "=a" (old));
+    return old;
+}
+
+#define Kernel_Interrupt_Restore(__old__) \
+    __asm__ volatile ( \
+        "wsr.ps %0\n" \
+        "rsync" \
+        : \
+        : "a" (__old__))
+
+static inline uint32_t Kernel_Interrupt_Activate(uint32_t const mask) {
+    uint32_t const old = Kernel_Interrupt_Disable();
+    uint32_t intenable;
+    __asm__ volatile (
+        "rsr.intenable %0\n"
+        : "=a" (intenable));
+    __asm__ volatile (
+        "wsr.intenable %0\n"
+        "rsync"
+        :
+        : "a" (intenable | mask));
+    Kernel_Interrupt_Restore(old);
+    return intenable;
+}
+
+static inline uint32_t Kernel_Interrupt_Deactivate(uint32_t const mask) {
+    uint32_t const old = Kernel_Interrupt_Disable();
+    uint32_t intenable;
+    __asm__ volatile (
+        "rsr.intenable %0\n"
+        : "=a" (intenable));
+    __asm__ volatile (
+        "wsr.intenable %0"
+        :
+        : "a" (intenable & ~mask));
+    Kernel_Interrupt_Restore(old);
+    return intenable;
+}
+
+static inline uint32_t Kernel_Interrupt_Read(void) {
+    uint32_t interrupts;
+    __asm__ volatile (
+        "rsr.interrupts %0"
+        : "=a" (interrupts));
+    return interrupts;
+}
+
+#define Kernel_Interrupt_Clear(__mask__) \
+    __asm__ volatile ( \
+        "wsr.intclear %0\n" \
+        "rsync" \
+        : \
+        : "a" (__mask__))
 
 #endif /* _ETSSOS_KERNEL_INTERRUPT_H_ */

@@ -12,6 +12,7 @@
 #define _ETSSOS_DRIVERS_TIMER_H_
 
 #include "../common.h"
+#include "../../arch/archdef.h"
 
 #define DRIVERS_TIMER_PERI 0x60000600
 
@@ -61,7 +62,9 @@ typedef enum word_sized DRIVERS_TIMER_FRC2_INT_ADDR_BIT {
     DRIVERS_TIMER_FRC2_INT_ADDR_CLR  = 0x00000001,
 } DRIVERS_TIMER_FRC2_INT_ADDR_BIT;
 
+#define DRIVERS_TIMER_PRESCALE_DIVIDER  16
+#define DRIVERS_TIMER_MS_TO_TICK_SCALAR (CPU_CLK_FREQ / DRIVERS_TIMER_PRESCALE_DIVIDER)
+
 void Drivers_Timer_Init(void);
-void Drivers_Timer_Delay(uint32_t const);
 
 #endif /* _ETSSOS_DRIVERS_TIMER_H_ */
