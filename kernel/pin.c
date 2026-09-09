@@ -11,8 +11,8 @@ void Kernel_Pin_SetFunc(uint8_t const pin, uint8_t const func, uint8_t const pul
     Drivers_IOMUX_SetFunc(pin, func, pullup);
 }
 
-void Kernel_Pin_SetMode(uint8_t const pin, Kernel_Pin_Mode const mode) {
-    if (mode == Kernel_Pin_Mode_Output) {
+void Kernel_Pin_SetMode(uint8_t const pin, KERNEL_PIN_MODE const mode) {
+    if (mode == KERNEL_PIN_MODE_OUTPUT) {
         DRIVERS_GPIO_ENA_W1TS |= (1 << pin);
     }
     else {

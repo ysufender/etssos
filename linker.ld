@@ -26,12 +26,13 @@ SECTIONS {
 
     .text : {
         _text_start = ABSOLUTE(.);
-        . = ALIGN(16);
         KEEP(*boot.o(.text.interrupt_vector))
+        . = ALIGN(16);
         *boot.o(.literal*)
         *boot.o(.text*)
         *(.literal*)
         *(.text*)
+        . = ALIGN(4);
         _text_end = ABSOLUTE(.);
     } > iram_seg
 

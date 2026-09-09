@@ -10,12 +10,6 @@
 #include "pin.h"
 
 #define noreturn __attribute__((noreturn))
-uint8_t val = 1;
-
-void pin_callback(void) {
-    Kernel_Pin_Digital_Write(2, val);
-    val = !val;
-}
 
 void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
@@ -23,12 +17,9 @@ void Kernel_Kernel_Main(void) {
     Kernel_Pin_Init();
     Kernel_Interrupt_Init();
 
-    Kernel_Pin_SetFunc(2, KERNEL_PIN_GPIO2_FUNC_GPIO, ON);
-    Kernel_Pin_SetMode(2, Kernel_Pin_Mode_Output);
-
-    Kernel_Timer* const timer = Kernel_Timer_Create(Kernel_Timer_Mode_Seconds, 1, pin_callback);
-    timer->flags |= KERNEL_TIMER_FLAGS_RELOAD | KERNEL_TIMER_FLAGS_ACTIVE;
-
+    Kernel_Timer* const timer = Kernel_Timer_Create(Kernel_Timer_Mode_Seconds, 1, Kernel_Kernel_DumpInfo);
+    timer->flags |= KERNEL_TIMER_FLAGS_ACTIVE;
+    
     while (1);
 }
 
@@ -51,13 +42,16 @@ void Kernel_Kernel_DumpInfo(void) {
 void noreturn Kernel_Kernel_Panic_Dump() {
     uint8_t  cause;
     uint32_t addr;
+    uint32_t excvaddr;
 
     __asm__ volatile (
         "rsr.exccause %0\n"
-        "rsr.epc1 %1"
-        : "=a" (cause), "=a" (addr));
+        "rsr.epc1 %1\n"
+        "rsr.excvaddr %2"
+        : "=a" (cause), "=a" (addr), "=a" (excvaddr));
 
     Kernel_IO_PrintFormat("Address: %x\n", addr);
+    Kernel_IO_PrintFormat("Excvaddr: %x\n", excvaddr);
     Kernel_IO_PrintFormat("Cause: %s\n", cause < 30
                                             ? Kernel_Kernel_Panic_CauseStrings[cause]
                                             : "RESERVED");

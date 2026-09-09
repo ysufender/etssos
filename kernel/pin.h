@@ -86,14 +86,14 @@
 #define HIGH 1
 #define LOW  0
 
-typedef enum backing(uint8_t) Kernel_Pin_Mode {
-    Kernel_Pin_Mode_Output,
-    Kernel_Pin_Mode_Input,
-} Kernel_Pin_Mode;
+typedef enum backing(uint8_t) KERNEL_PIN_MODE {
+    KERNEL_PIN_MODE_OUTPUT,
+    KERNEL_PIN_MODE_INPUT,
+} KERNEL_PIN_MODE;
 
 void    Kernel_Pin_Init(void);
 void    Kernel_Pin_SetFunc(uint8_t const, uint8_t const, uint8_t const);
-void    Kernel_Pin_SetMode(uint8_t const, Kernel_Pin_Mode const);
+void    Kernel_Pin_SetMode(uint8_t const, KERNEL_PIN_MODE const);
 void    Kernel_Pin_Digital_Write(uint8_t const, uint8_t const);
 uint8_t Kernel_Pin_Digital_Read(uint8_t const);
 

@@ -28,7 +28,7 @@ local options = {
     as = "xtensa-lx106-elf-as ",
     cc = "xtensa-lx106-elf-gcc ",
     ld = "xtensa-lx106-elf-ld ",
-    cflags = "-c -Wall -Wextra -Werror ",
+    cflags = "-c -O2 -Wall -Wextra -Werror ",
     asflags = " ",
     ldflags = "-T linker.ld "
               .."-nostdlib -nostartfiles -nodefaultlibs ",

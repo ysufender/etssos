@@ -129,6 +129,10 @@ void Kernel_IO_PutStringLine(char const* const str) {
     Drivers_UART_PutChar('\n');
 }
 
+void Kernel_IO_PutChar(char const ch) {
+    Drivers_UART_PutChar(ch);
+}
+
 void Kernel_IO_Init(void) {
     Drivers_UART_Init();
 }

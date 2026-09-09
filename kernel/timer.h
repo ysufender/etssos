@@ -20,8 +20,9 @@ extern volatile uint32_t DRIVERS_TIMER_CLK_FREQ;
 typedef void (*Kernel_Timer_Callback)();
 
 typedef enum backing(uint8_t) KERNEL_TIMER_FLAGS {
-    KERNEL_TIMER_FLAGS_ACTIVE = (1 << 0),
-    KERNEL_TIMER_FLAGS_RELOAD = (1 << 1),
+    KERNEL_TIMER_FLAGS_ACTIVE  = (1 << 0),
+    KERNEL_TIMER_FLAGS_RELOAD  = (1 << 1),
+    KERNEL_TIMER_FLAGS_ENABLED = (1 << 2),
 } KERNEL_TIMER_FLAGS;
 
 typedef struct Kernel_Timer {

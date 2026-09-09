@@ -17,5 +17,6 @@ void Kernel_IO_Init(void);
 void Kernel_IO_PrintFormat(char const* const, ...);
 void Kernel_IO_PutString(char const* const);
 void Kernel_IO_PutStringLine(char const* const);
+void Kernel_IO_PutChar(char const);
 
 #endif /* _ETSSOS_KERNEL_IO_H_ */
