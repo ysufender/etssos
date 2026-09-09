@@ -2,8 +2,6 @@
 
 #include "timer.h"
 
-#include "../drivers/uart/uart.h"
-
 Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT] = { 0 };
 
 void Kernel_Interrupt_Dispatch(void) {
@@ -25,7 +23,6 @@ void Kernel_Interrupt_Software_Dispatch(void) {
 }
 
 void Kernel_Interrupt_Scheduled(void) {
-    Drivers_UART_PutStringLine("Scheduled interrupt");
 }
 
 void Kernel_Interrupt_Init(void) {

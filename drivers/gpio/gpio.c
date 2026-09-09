@@ -1,14 +1,12 @@
 #include "gpio.h"
 
 #include "../iomux.h"
-#include "../uart/uart.h"
 
 void Drivers_GPIO_Init(void) {
     for (uint8_t pin = 0; pin < DRIVERS_GPIO_PIN_CNT; pin++) {
         Drivers_IOMUX_GPIO_SetPullup(pin, 1);
+        Drivers_GPIO_PinSetup(pin);
     }
-
-    Drivers_UART_PutStringLine("GPIO Initialization successful.");
 }
 
 void Drivers_GPIO_SetMode(uint8_t const pin, DRIVERS_GPIO_MODE const mode) {
@@ -20,11 +18,9 @@ void Drivers_GPIO_SetMode(uint8_t const pin, DRIVERS_GPIO_MODE const mode) {
     }
 }
 
-void Drivers_GPIO_Write(uint8_t const pin, uint16_t const val) {
-    if (pin >= 6 && pin <= 11) return;
-    if (val) {
-        DRIVERS_GPIO_OUT_W1TS = (1 << pin);
-    } else {
-        DRIVERS_GPIO_OUT_W1TC = (1 << pin);
-    }
+void Drivers_GPIO_PinSetup_Impl(uint8_t const pinnum, Drivers_GPIO_Pin_Setup_Params const params) {
+    Drivers_GPIO_PIN(pinnum) = (params.source        << 0)
+                             | (params.driver        << 2)
+                             | (params.interruptType << 7)
+                             | (params.wakeup        << 10);
 }

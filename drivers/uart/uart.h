@@ -148,9 +148,7 @@ void Drivers_UART_DetectClock(void);
 void Drivers_UART_Init();
 void Drivers_UART_PutChar(uint8_t const);
 void Drivers_UART_PutString(char const* const);
-void Drivers_UART_PutStringLine(char const* const);
 void Drivers_UART_SetBaud(uint32_t const);
 void Drivers_UART_ExhaustOutput();
-void Drivers_UART_PrintFormat(char const* const, ...); /* only supports %s and %d */
 
 #endif /* _ETSSOS_DRIVERS_UART0_H_ */

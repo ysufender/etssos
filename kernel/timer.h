@@ -15,6 +15,8 @@
 
 #include "../drivers/common.h"
 
+extern volatile uint32_t DRIVERS_TIMER_CLK_FREQ;
+
 typedef void (*Kernel_Timer_Callback)();
 
 typedef enum backing(uint8_t) KERNEL_TIMER_FLAGS {

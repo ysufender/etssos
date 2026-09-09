@@ -7,13 +7,6 @@ uint32_t const Drivers_IOMUX_GPIO_GPIOVector[16] = {
     0x04, 0x08, 0x0C, 0x10,
 };
 
-uint32_t const Drivers_IOMUX_GPIO_FuncVector[16] = {
-    0x0, 0x3, 0x0, 0x3,
-    0x0, 0x0, 0x3, 0x3,
-    0x3, 0x3, 0x3, 0x3,
-    0x3, 0x3, 0x3, 0x3,
-};
-
 void Drivers_IOMUX_SetFunc(uint8_t const pin, uint8_t const func, uint8_t const pullup) {
     Drivers_IOMUX_GPIO(pin) = (func << DRIVERS_IOMUX_FUNC_SHIFT)
                               | (pullup ? (1 << DRIVERS_IOMUX_PIN_PULLUP) : 0);

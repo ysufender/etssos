@@ -90,7 +90,6 @@
 } while(0)
 
 extern uint32_t const Drivers_IOMUX_GPIO_GPIOVector[16];
-extern uint32_t const Drivers_IOMUX_GPIO_FuncVector[16];
 
 void Drivers_IOMUX_SetFunc(uint8_t const, uint8_t const, uint8_t const);
 

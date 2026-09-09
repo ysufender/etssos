@@ -6,12 +6,16 @@ local Efile = require "efile"
 local Common = require "script.common"
 
 local sources = {
-    "kernel.c",
     "timer.c",
     "interrupt.c",
+    "pin.c",
+    "kernel.c",
+    "io.c",
 }
 
 local other = {
+    "kernel/pin.h",
+    "kernel/io.h",
     "kernel/interrupt.h",
     "kernel/kernel.h",
     "kernel/timer.h",

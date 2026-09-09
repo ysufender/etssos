@@ -1,36 +1,51 @@
 #include <stdarg.h>
 
+#include "../config/etssos_config.h"
+
 #include "kernel.h"
 
 #include "interrupt.h"
 #include "timer.h"
-#include "../config/etssos_config.h"
-#include "../drivers/uart/uart.h"
-#include "../drivers/timer/timer.h"
+#include "io.h"
+#include "pin.h"
 
 #define noreturn __attribute__((noreturn))
+uint8_t val = 1;
+
+void pin_callback(void) {
+    Kernel_Pin_Digital_Write(2, val);
+    val = !val;
+}
 
 void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
+    Kernel_IO_Init();
+    Kernel_Pin_Init();
     Kernel_Interrupt_Init();
 
-    while (1) { }
+    Kernel_Pin_SetFunc(2, KERNEL_PIN_GPIO2_FUNC_GPIO, ON);
+    Kernel_Pin_SetMode(2, Kernel_Pin_Mode_Output);
+
+    Kernel_Timer* const timer = Kernel_Timer_Create(Kernel_Timer_Mode_Seconds, 1, pin_callback);
+    timer->flags |= KERNEL_TIMER_FLAGS_RELOAD | KERNEL_TIMER_FLAGS_ACTIVE;
+
+    while (1);
 }
 
 void Kernel_Kernel_DumpInfo(void) {
-    Drivers_UART_PutStringLine("Kernel Info:");
-    Drivers_UART_PrintFormat("Name     : %s\n", ETSSOS_NAME);
-    Drivers_UART_PrintFormat("Version  : %s\n", ETSSOS_VERSION);
-    Drivers_UART_PrintFormat("Compiler : %s\n", ETSSOS_CC);
-    Drivers_UART_PrintFormat("CFLAGS   : %s\n", ETSSOS_CFLAGS);
-    Drivers_UART_PrintFormat("Linker   : %s\n", ETSSOS_LD);
-    Drivers_UART_PrintFormat("LDFLAGS  : %s\n", ETSSOS_LDFLAGS);
-    Drivers_UART_PrintFormat("Assembler: %s\n", ETSSOS_AS);
-    Drivers_UART_PrintFormat("ASFLAGS  : %s\n", ETSSOS_ASFLAGS);
-    Drivers_UART_PrintFormat("Burner   : %s\n", ETSSOS_BURNER);
-    Drivers_UART_PrintFormat("BAUD     : %u\n", ETSSOS_BAUD);
-    Drivers_UART_PrintFormat("Board    : %s\n", ETSSOS_BOARD);
-    Drivers_UART_PrintFormat("UART CLK : %u\n", DRIVERS_TIMER_CLK_FREQ);
+    Kernel_IO_PutStringLine("Kernel Info:");
+    Kernel_IO_PrintFormat("Name     : %s\n", ETSSOS_NAME);
+    Kernel_IO_PrintFormat("Version  : %s\n", ETSSOS_VERSION);
+    Kernel_IO_PrintFormat("Compiler : %s\n", ETSSOS_CC);
+    Kernel_IO_PrintFormat("CFLAGS   : %s\n", ETSSOS_CFLAGS);
+    Kernel_IO_PrintFormat("Linker   : %s\n", ETSSOS_LD);
+    Kernel_IO_PrintFormat("LDFLAGS  : %s\n", ETSSOS_LDFLAGS);
+    Kernel_IO_PrintFormat("Assembler: %s\n", ETSSOS_AS);
+    Kernel_IO_PrintFormat("ASFLAGS  : %s\n", ETSSOS_ASFLAGS);
+    Kernel_IO_PrintFormat("Burner   : %s\n", ETSSOS_BURNER);
+    Kernel_IO_PrintFormat("BAUD     : %u\n", ETSSOS_BAUD);
+    Kernel_IO_PrintFormat("Board    : %s\n", ETSSOS_BOARD);
+    Kernel_IO_PrintFormat("UART CLK : %u\n", DRIVERS_TIMER_CLK_FREQ);
 }
 
 void noreturn Kernel_Kernel_Panic_Dump() {
@@ -42,11 +57,11 @@ void noreturn Kernel_Kernel_Panic_Dump() {
         "rsr.epc1 %1"
         : "=a" (cause), "=a" (addr));
 
-    Drivers_UART_PrintFormat("Address: %x\n", addr);
-    Drivers_UART_PrintFormat("Cause: %s\n", cause < 30
+    Kernel_IO_PrintFormat("Address: %x\n", addr);
+    Kernel_IO_PrintFormat("Cause: %s\n", cause < 30
                                             ? Kernel_Kernel_Panic_CauseStrings[cause]
                                             : "RESERVED");
-    Drivers_UART_PutStringLine("Entering fault loop.");
+    Kernel_IO_PutStringLine("Entering fault loop.");
 
     while (1);
 }
@@ -66,17 +81,17 @@ void Kernel_Kernel_Panic(void) {
 }
 
 void noreturn Kernel_Kernel_Panic_Unreachable(void) {
-    Drivers_UART_PutStringLine("Kernel reached unreachable code.");
+    Kernel_IO_PutStringLine("Kernel reached unreachable code.");
     while (1);
 }
 
 void noreturn Kernel_Kernel_Panic_Debug(void) {
-    Drivers_UART_PutStringLine("Kernel reached debug exception.");
+    Kernel_IO_PutStringLine("Kernel reached debug exception.");
     Kernel_Kernel_Panic_Dump();
 }
 
 void noreturn Kernel_Kernel_Panic_NonMaskable(void) {
-    Drivers_UART_PutStringLine("Kernel reached a non-maskable interrupt.");
+    Kernel_IO_PutStringLine("Kernel reached a non-maskable interrupt.");
     Kernel_Kernel_Panic_Dump();
 }
 
@@ -90,13 +105,13 @@ void Kernel_Kernel_Panic_UserError(void) {
         Kernel_Interrupt_Dispatch();
     }
     else {
-        Drivers_UART_PutStringLine("Panic in userspace code.");
+        Kernel_IO_PutStringLine("Panic in userspace code.");
         Kernel_Kernel_Panic_Dump();
     }
 }
 
 void noreturn Kernel_Kernel_Panic_Double(void) {
-    Drivers_UART_PutStringLine("Double panic.");
+    Kernel_IO_PutStringLine("Double panic.");
 
     uint32_t addr;
 
@@ -104,7 +119,7 @@ void noreturn Kernel_Kernel_Panic_Double(void) {
         "rsr.epc2 %0"
         : "=a" (addr));
 
-    Drivers_UART_PrintFormat("Most Recent Addr: %x\n", addr);
+    Kernel_IO_PrintFormat("Most Recent Addr: %x\n", addr);
     Kernel_Kernel_Panic_Dump();
 }
 

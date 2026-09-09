@@ -14,7 +14,7 @@
 #include "../common.h"
 #include "../iomux.h"
 
-#define DRIVERS_GPIO_PERI    0x60000300
+#define DRIVERS_GPIO_PERI    ((uintptr_t)(0x60000300))
 #define DRIVERS_GPIO_PIN_CNT 16
 
 #define DRIVERS_GPIO_OUT             (*(volatile uint32_t*)(DRIVERS_GPIO_PERI + 0x00000000))
@@ -113,12 +113,17 @@ typedef enum backing(uint8_t) DRIVERS_GPIO_MODE {
     DRIVERS_GPIO_MODE_OUTPUT,
 } DRIVERS_GPIO_MODE;
 
-#define Drivers_GPIO_Read(__pinnum__) ((GPIO_IN >> (__pinnum__)) & 1)
-#define Drivers_GPIO_Enable(__pinnum__, __ena__) Drivers_IOMUX_SetFunc((__pinnum__), Drivers_IOMUX_GPIO_FuncVector[(__pinnum__)], (__ena__))
+typedef struct Drivers_GPIO_Pin_Setup_Params {
+    uint8_t source;
+    uint8_t driver;
+    uint8_t interruptType;
+    uint8_t wakeup;
+} Drivers_GPIO_Pin_Setup_Params;
 
+void Drivers_GPIO_Init(void);
+void Drivers_GPIO_SetMode(uint8_t const, DRIVERS_GPIO_MODE const);
 
-void     Drivers_GPIO_Init(void);
-void     Drivers_GPIO_SetMode(uint8_t const, DRIVERS_GPIO_MODE const);
-void     Drivers_GPIO_Write(uint8_t const, uint16_t const);
+#define Drivers_GPIO_PinSetup(__pinnum__, ...) Drivers_GPIO_PinSetup_Impl((__pinnum__), (Drivers_GPIO_Pin_Setup_Params){ __VA_ARGS__ })
+void Drivers_GPIO_PinSetup_Impl(uint8_t const, Drivers_GPIO_Pin_Setup_Params const);
 
 #endif /* _ETSSOS_DRIVERS_GPIO_H_ */
