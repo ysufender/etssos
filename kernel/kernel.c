@@ -5,12 +5,16 @@
 #include "interrupt.h"
 #include "timer.h"
 #include "../config/etssos_config.h"
+#include "../drivers/uart/uart.h"
+#include "../drivers/timer/timer.h"
 
 #define noreturn __attribute__((noreturn))
 
 void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
-    while (1);
+    Kernel_Interrupt_Init();
+
+    while (1) { }
 }
 
 void Kernel_Kernel_DumpInfo(void) {

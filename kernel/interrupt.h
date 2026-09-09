@@ -79,6 +79,7 @@ typedef void (*Kernel_Interrupt_Handler)();
 
 void Kernel_Interrupt_Init(void);
 void Kernel_Interrupt_Dispatch(void);
+void Kernel_Interrupt_Scheduled(void);
 
 extern Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT];
 #define Kernel_Interrupt_Register(__src__, __handler__) Kernel_Interrupt_RegistrationVector[__src__] = __handler__

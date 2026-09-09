@@ -17,6 +17,9 @@ local Drivers = require "script.drivers"
 ---@module "script.other"
 local Other = require "script.other"
 
+---@module "script.libc"
+local LibC = require "script.libc"
+
 ---@type Common.Options
 local options = {
     name = "etssos",
@@ -25,7 +28,7 @@ local options = {
     as = "xtensa-lx106-elf-as ",
     cc = "xtensa-lx106-elf-gcc ",
     ld = "xtensa-lx106-elf-ld ",
-    cflags = "-c -O2 -Wall -Wextra -Werror ",
+    cflags = "-c -Wall -Wextra -Werror ",
     asflags = " ",
     ldflags = "-T linker.ld "
               .."-nostdlib -nostartfiles -nodefaultlibs ",
@@ -93,6 +96,7 @@ project
     :multiStep(Arch.steps(options))
     :multiStep(Kernel.steps(options))
     :multiStep(Drivers.steps(options))
+    :multiStep(LibC.steps(options))
 
     :step(Linker.step(project, options))
 
