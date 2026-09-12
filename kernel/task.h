@@ -6,13 +6,14 @@
  *
  *
  * NAME       : kernel/task.h
- * DESCRIPTION: Task scheduling utilities
+ * DESCRIPTION: Task managing utilities
  */
 
 #ifndef _ETSSOS_KERNEL_TASK_H_
 #define _ETSSOS_KERNEL_TASK_H_
 
 #include "../drivers/common.h"
+#include "timer.h"
 
 typedef enum backing(uint8_t) KERNEL_TASK_STATUS {
     KERNEL_TASK_READY,
@@ -22,16 +23,29 @@ typedef enum backing(uint8_t) KERNEL_TASK_STATUS {
     KERNEL_TASK_TERMINATED,
 } KERNEL_TASK_STATUS;
 
-typedef struct Kernel_Task_Info {
+typedef struct Kernel_Task {
     uint32_t*          sp;
     uint32_t*          bp;
     uint32_t           stackSize;
-    uint32_t           priority;
     uint64_t           wakeTick;
-    char               name[16];
+    uint8_t            priority;
     KERNEL_TASK_STATUS state;
-} Kernel_Task_Info;
+    char               name[16];
+} Kernel_Task;
 
-typedef void (*Kernel_Task)(void);
+typedef void (*Kernel_Task_Entry)(void);
+
+#define KERNEL_TASK_MAX_COUNT  16
+#define KERNEL_TASK_STACK_SIZE 1024
+
+extern Kernel_Task Kernel_Task_Pool[KERNEL_TASK_MAX_COUNT];
+extern uint8_t     Kernel_Task_Count;
+
+Kernel_Task*                   Kernel_Task_Create(char const* const,
+                                                  Kernel_Task_Entry const,
+                                                  uint8_t const);
+void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const);
+void                           Kernel_Task_Sleep(Kernel_Timer_Mode const, uint32_t const);
+void __attribute__((noreturn)) Kernel_Task_Idle(void);
 
 #endif /* _ETSSOS_KERNEL_TASK_H_ */

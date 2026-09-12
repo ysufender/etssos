@@ -6,31 +6,15 @@ local Efile = require "efile"
 local Common = require "script.common"
 
 local sources = {
-    "scheduler.c",
-    "timer.c",
-    "interrupt.c",
-    "pin.c",
-    "kernel.c",
-    "io.c",
-    "system.c",
-    "task.c",
+    "user.c",
 }
 
 local other = {
-    "kernel/system.h",
-    "kernel/task.h",
-    "kernel/scheduler.h",
-    "kernel/pin.h",
-    "kernel/io.h",
-    "kernel/interrupt.h",
-    "kernel/kernel.h",
-    "kernel/timer.h",
-    "script/kernel.lua",
 }
 
 ---@param sub_path string
 ---@return string
-local function kernel(sub_path) return "kernel/"..sub_path end
+local function user(sub_path) return "user/"..sub_path end
 
 ---@param options Common.Options
 ---@return Efile.Step[]
@@ -39,16 +23,13 @@ local function steps(options)
     local step_names = { }
 
     for _, src in ipairs(sources) do
-        local resolved_src = kernel(src)
+        local resolved_src = user(src)
         local cmd, out, pre = Common.cc(resolved_src, options)
         table.insert(step_names, out)
 
         local step = Efile.Step
             .init(out)
-            :dependOnSteps({
-                "base",
-                "libc",
-            })
+            :dependOnStep("base")
             :dependOnFiles(other)
             :dependOnFile(resolved_src)
             :action(cmd)
@@ -57,7 +38,7 @@ local function steps(options)
     end
 
     table.insert(_steps, Efile.Step
-        .init("kernel")
+        .init("user")
         :dependOnSteps(step_names))
 
     return _steps

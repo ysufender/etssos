@@ -21,11 +21,4 @@ void Drivers_Timer_Init(void) {
                                  | (divider << 2)
                                  | (1 << 6)
                                  | (1 << 7);
-
-    DRIVERS_TIMER_FRC2_LOAD       = 0;
-    DRIVERS_TIMER_FRC2_ALARM_ADDR = DRIVERS_TIMER_FRC2_INTERVAL_TICKS; 
-    DRIVERS_TIMER_FRC1_CTRL_ADDR  = (0 << 0)
-                                  | (divider << 2)
-                                  | (1 << 6)
-                                  | (1 << 7);
 }

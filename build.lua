@@ -20,6 +20,9 @@ local Other = require "script.other"
 ---@module "script.libc"
 local LibC = require "script.libc"
 
+---@module "script.user"
+local User = require "script.user"
+
 ---@type Common.Options
 local options = {
     name = "etssos",
@@ -97,6 +100,7 @@ project
     :multiStep(Kernel.steps(options))
     :multiStep(Drivers.steps(options))
     :multiStep(LibC.steps(options))
+    :multiStep(User.steps(options))
 
     :step(Linker.step(project, options))
 

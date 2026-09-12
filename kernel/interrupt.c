@@ -1,10 +1,13 @@
 #include "interrupt.h"
 
 #include "timer.h"
+#include "io.h"
 
 Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT] = { 0 };
 
 void Kernel_Interrupt_Dispatch(void) {
+    uint32_t const ps = Kernel_Interrupt_Disable();
+
     uint32_t const interrupts = Kernel_Interrupt_Read();
 
     for (uint32_t i = 0; i < KERNEL_INTERRUPT_COUNT; i++) {
@@ -16,13 +19,24 @@ void Kernel_Interrupt_Dispatch(void) {
             }
         }
     }
+
+    Kernel_Interrupt_Restore(ps);
 }
 
 void Kernel_Interrupt_Software_Dispatch(void) {
-    Kernel_Interrupt_Clear(KERNEL_INTERRUPT_SOURCE_SOFT);
-}
+    uint32_t interruptMode, parameter;
+    __asm__ volatile (
+        "mov %0, a2\n"
+        "mov %1, a3"
+        : "=a" (interruptMode),
+          "=a" (parameter));
 
-void Kernel_Interrupt_Scheduled(void) {
+    switch (interruptMode) {
+        case 0: /* Error */
+            Kernel_IO_PrintFormat("Error: %u", parameter);
+            __asm__ volatile ( "ill" );
+            while (1);
+    }
 }
 
 void Kernel_Interrupt_Init(void) {

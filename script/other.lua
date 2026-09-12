@@ -41,12 +41,12 @@ function Other.upload(options)
                     .."--no-stub "
                     .."write-flash "..address.." "..match
 
-        table.insert(step_names, match)
         table.insert(steps, Efile.Step
             .init(match)
             :dependOnStep("create_bin")
             :dependOnFile("script/other.lua")
             :action(cmd))
+        table.insert(step_names, match)
     end
 
     table.insert(steps, Efile.Step

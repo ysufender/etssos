@@ -8,8 +8,8 @@ __stack_top = ORIGIN(dram_seg) + LENGTH(dram_seg);
 ENTRY(_etssos_boot_entry);
 
 SECTIONS {
-
     .bss (NOLOAD) : {
+        . = ALIGN(4);
         _bss_start = ABSOLUTE(.);
         *(.bss*)
         *(COMMON)
@@ -18,6 +18,7 @@ SECTIONS {
     } >dram_seg
 
     .data : {
+        . = ALIGN(4);
         _data_start = ABSOLUTE(.);
         *(.data*)
         . = ALIGN(4);
@@ -37,6 +38,7 @@ SECTIONS {
     } > iram_seg
 
     .rodata : {
+        . = ALIGN(4);
         _rodata_lma = LOADADDR(.rodata);
         _rodata_start = ABSOLUTE(.);
         *(.rodata*)

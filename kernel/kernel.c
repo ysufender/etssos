@@ -8,19 +8,25 @@
 #include "timer.h"
 #include "io.h"
 #include "pin.h"
+#include "scheduler.h"
+#include "task.h"
+#include "system.h"
 
 #define noreturn __attribute__((noreturn))
+
+void noreturn Kernel_Kernel_Panic_Unreachable(void);
 
 void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
     Kernel_IO_Init();
     Kernel_Pin_Init();
+    Kernel_Scheduler_Init();
+    Kernel_Task_Create("idle", Kernel_Task_Idle, 0);
+    Kernel_Task_Create("systemt", Kernel_System_Task, 255);
     Kernel_Interrupt_Init();
+    Kernel_Scheduler_Start();
 
-    Kernel_Timer* const timer = Kernel_Timer_Create(Kernel_Timer_Mode_Seconds, 1, Kernel_Kernel_DumpInfo);
-    timer->flags |= KERNEL_TIMER_FLAGS_ACTIVE;
-    
-    while (1);
+    Kernel_Kernel_Panic_Unreachable();
 }
 
 void Kernel_Kernel_DumpInfo(void) {
