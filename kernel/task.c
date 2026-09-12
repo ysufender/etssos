@@ -2,7 +2,6 @@
 
 #include "error.h"
 #include "scheduler.h"
-#include "io.h"
 #include "timer.h"
 
 extern uint32_t max(uint32_t const, uint32_t const);
@@ -19,13 +18,13 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
         THROW(Kernel_Error_StackOverflow); 
     }
 
-    uint32_t *const stop  = &Kernel_Task_Stacks[max(Kernel_Task_Count - 1, 0)][KERNEL_TASK_STACK_SIZE / 4],
-             *const frame = stop - 15;
+    uint32_t *const stop  = &Kernel_Task_Stacks[Kernel_Task_Count][KERNEL_TASK_STACK_SIZE / 4 - 1],
+             *const frame = stop - 17;
 
     frame[0]  = (uint32_t)(uintptr_t)callback;
-    for (uint8_t i = 1; i <= 12; i++) frame[i] = 0;
-    frame[13] = (uint32_t)(uintptr_t)callback;
-    frame[14] = 0;
+    for (uint8_t i = 1; i <= 14; i++) frame[i] = 0;
+    frame[15] = (uint32_t)(uintptr_t)callback;
+    frame[16] = 0;
 
     Kernel_Task* const task = &Kernel_Task_Pool[Kernel_Task_Count];
     task->sp        = frame;

@@ -16,31 +16,33 @@ void Kernel_Scheduler_Init(void) {
 }
 
 void Kernel_Scheduler_Tick(void) {
-    Kernel_Task* next     = 0;
-    uint8_t      priority = 0;
+    Kernel_Task* next = 0;
+    uint8_t priority = 0;
 
     for (uint8_t i = 0; i < Kernel_Task_Count; i++) {
         Kernel_Task* const task = &Kernel_Task_Pool[i];
-        if (task->state == KERNEL_TASK_READY && task->priority >= priority) {
+
+        if (task->state == KERNEL_TASK_SLEEPING &&
+            Kernel_Timer_Ticks >= task->wakeTick) {
+            task->state = KERNEL_TASK_READY;
+        }
+
+        if (task->state == KERNEL_TASK_READY &&
+            (!next || task->priority > priority)) {
             priority = task->priority;
             next = task;
         }
-        else if (task->state == KERNEL_TASK_SLEEPING
-                 && Kernel_Timer_Ticks >= task->wakeTick) {
-            task->state = KERNEL_TASK_READY;
-        }
     }
 
-    if (next) {
-        if (Kernel_Scheduler_Current
-            && Kernel_Scheduler_Current->state == KERNEL_TASK_RUNNING) {
-            Kernel_Scheduler_Current->state = KERNEL_TASK_READY;
-        }
+    if (!next || next == Kernel_Scheduler_Current)
+        return;
 
-        if (next != Kernel_Scheduler_Current) {
-            Kernel_Scheduler_Switched = 1;
-            next->state = KERNEL_TASK_RUNNING;
-            Kernel_Scheduler_Current = next;
-        }
+    if (Kernel_Scheduler_Current &&
+        Kernel_Scheduler_Current->state == KERNEL_TASK_RUNNING) {
+        Kernel_Scheduler_Current->state = KERNEL_TASK_READY;
     }
+
+    next->state = KERNEL_TASK_RUNNING;
+    Kernel_Scheduler_Current = next;
+    Kernel_Scheduler_Switched = 1;
 }

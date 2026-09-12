@@ -1,5 +1,5 @@
 .macro m_save_registers
-    addi a1, a1, -60
+    addi a1, a1, -68
     s32i a0,  a1, 0
     s32i a4,  a1, 4
     s32i a5,  a1, 8
@@ -13,10 +13,15 @@
     s32i a13, a1, 40
     s32i a14, a1, 44
     s32i a15, a1, 48
+    s32i a2,  a1, 52
+
+    s32i a3,  a1, 56
     rsr.epc1 a2
-    s32i a2, a1, 52
+
+    s32i a2, a1, 60
     rsr.ps a2
-    s32i a2, a1, 56
+
+    s32i a2, a1, 64
 .endm
 
 .macro m_restore_registers
@@ -33,12 +38,18 @@
     l32i a13, a1, 40
     l32i a14, a1, 44
     l32i a15, a1, 48
-    l32i a2,  a1, 52
+
+    l32i a2,  a1, 60
     wsr.epc1 a2
-    l32i a2,  a1, 56
+
+    l32i a2,  a1, 64
     wsr.ps a2
     rsync
-    addi a1,  a1, 60
+
+    l32i a2,  a1, 52
+    l32i a3,  a1, 56
+
+    addi a1,  a1, 68
 .endm
 
 .section .text.interrupt_vector

@@ -7,7 +7,6 @@
 #include "interrupt.h"
 #include "timer.h"
 #include "io.h"
-#include "pin.h"
 #include "scheduler.h"
 #include "task.h"
 #include "system.h"
