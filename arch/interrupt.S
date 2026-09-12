@@ -144,7 +144,7 @@
         l32i a2, a2, 0
         l32i a1, a2, 0
         l32i a0, a1, 0
-        addi a1, a1, 60
+        addi a1, a1, 68
         jx a0
 
     .type _etssos_reset, @function
