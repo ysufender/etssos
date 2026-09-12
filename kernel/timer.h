@@ -41,6 +41,8 @@ typedef enum backing(uint8_t) Kernel_Timer_Mode {
 
 #define KERNEL_TIMER_COUNT 32
 
+extern uint64_t Kernel_Timer_Ticks;
+
 void          Kernel_Timer_Init(void);
 Kernel_Timer* Kernel_Timer_Create(Kernel_Timer_Mode     const,
                                   uint32_t              const,

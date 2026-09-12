@@ -4,7 +4,10 @@
 
 static Kernel_Timer Kernel_Timer_SoftwareTimers[KERNEL_TIMER_COUNT]  = {0};
 
+uint64_t Kernel_Timer_Ticks = 0;
+
 void Kernel_Timer_FRC1_Interrupt_Handler(void) {
+    Kernel_Timer_Ticks++;
     for (uint32_t i = 0; i < KERNEL_TIMER_COUNT; i++) {
         Kernel_Timer* const timer = &Kernel_Timer_SoftwareTimers[i];
         if (!(timer->flags & KERNEL_TIMER_FLAGS_ACTIVE)) continue;

@@ -86,7 +86,7 @@
         movi a2, Kernel_Scheduler_Current
         l32i a2, a2, 0
         beqz a2, 1f
-        s32i a2, a2, 0
+        s32i a1, a2, 0
         1:
         call0 Kernel_Kernel_Panic
         movi a2, Kernel_Scheduler_Switched
@@ -109,7 +109,7 @@
         movi a2, Kernel_Scheduler_Current
         l32i a2, a2, 0
         beqz a2, 1f
-        s32i a2, a2, 0
+        s32i a1, a2, 0
         1:
         call0 Kernel_Kernel_Panic_UserError
         movi a2, Kernel_Scheduler_Switched

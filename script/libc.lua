@@ -7,9 +7,11 @@ local Common = require "script.common"
 
 local sources = {
     "memory.c",
+    "math.c",
 }
 
 local other = {
+    "libc/math.h",
     "libc/memory.h",
     "script/libc.lua",
 }

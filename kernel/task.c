@@ -2,6 +2,10 @@
 
 #include "error.h"
 #include "scheduler.h"
+#include "io.h"
+#include "timer.h"
+
+extern uint32_t max(uint32_t const, uint32_t const);
 
 Kernel_Task Kernel_Task_Pool[KERNEL_TASK_MAX_COUNT] = { 0 };
 uint8_t     Kernel_Task_Count                       = 0;
@@ -15,7 +19,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
         THROW(Kernel_Error_StackOverflow); 
     }
 
-    uint32_t *const stop  = &Kernel_Task_Stacks[Kernel_Task_Count - 1][KERNEL_TASK_STACK_SIZE / 4],
+    uint32_t *const stop  = &Kernel_Task_Stacks[max(Kernel_Task_Count - 1, 0)][KERNEL_TASK_STACK_SIZE / 4],
              *const frame = stop - 15;
 
     frame[0]  = (uint32_t)(uintptr_t)callback;
@@ -42,6 +46,16 @@ void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const
     task->state = KERNEL_TASK_TERMINATED;
     Kernel_Scheduler_Tick();
     Kernel_Task_Idle();
+}
+
+void Kernel_Task_Sleep(Kernel_Timer_Mode const mode, uint32_t const amount) {
+    Kernel_Scheduler_Current->state    = KERNEL_TASK_SLEEPING;
+    Kernel_Scheduler_Current->wakeTick = Kernel_Timer_Ticks
+                                       + amount
+                                         * (mode == Kernel_Timer_Mode_Seconds
+                                         ? 1000
+                                         : 1);
+    Kernel_Scheduler_Tick();
 }
 
 void __attribute__((noreturn)) Kernel_Task_Idle(void) {

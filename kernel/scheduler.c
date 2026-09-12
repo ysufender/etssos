@@ -3,7 +3,7 @@
 #include "task.h"
 #include "timer.h"
 
-volatile Kernel_Task* Kernel_Scheduler_Current;
+volatile Kernel_Task* Kernel_Scheduler_Current  = 0;
 volatile uint8_t      Kernel_Scheduler_Switched = 0;
 
 static Kernel_Timer* Kernel_Scheduler_Timer;
@@ -25,10 +25,15 @@ void Kernel_Scheduler_Tick(void) {
             priority = task->priority;
             next = task;
         }
+        else if (task->state == KERNEL_TASK_SLEEPING
+                 && Kernel_Timer_Ticks >= task->wakeTick) {
+            task->state = KERNEL_TASK_READY;
+        }
     }
 
     if (next) {
-        if (Kernel_Scheduler_Current) {
+        if (Kernel_Scheduler_Current
+            && Kernel_Scheduler_Current->state == KERNEL_TASK_RUNNING) {
             Kernel_Scheduler_Current->state = KERNEL_TASK_READY;
         }
 

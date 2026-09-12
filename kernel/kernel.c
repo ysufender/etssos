@@ -14,18 +14,18 @@
 
 #define noreturn __attribute__((noreturn))
 
+extern Kernel_Task Kernel_Task_Pool[KERNEL_TASK_MAX_COUNT];
+extern uint8_t     Kernel_Task_Count                      ;
+
 void noreturn Kernel_Kernel_Panic_Unreachable(void);
 
 void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
-    Kernel_IO_Init();
-    Kernel_Pin_Init();
-    Kernel_Scheduler_Init();
-    Kernel_Task_Create("idle", Kernel_Task_Idle, 0);
-    Kernel_Task_Create("systemt", Kernel_System_Task, 255);
     Kernel_Interrupt_Init();
+    Kernel_Scheduler_Init();
+    Kernel_Task_Create("idlet", Kernel_Task_Idle, 0);
+    Kernel_Task_Create("systemt", Kernel_System_Task, 255);
     Kernel_Scheduler_Start();
-
     Kernel_Kernel_Panic_Unreachable();
 }
 
@@ -63,7 +63,7 @@ void noreturn Kernel_Kernel_Panic_Dump() {
                                             : "RESERVED");
     Kernel_IO_PutStringLine("Entering fault loop.");
 
-    while (1);
+    while (1) __asm__ volatile ( "waiti 0" );
 }
 
 void Kernel_Kernel_Panic(void) {
