@@ -13,6 +13,7 @@
 #define _ETSSOS_KERNEL_SYSTEM_H_
 
 void Kernel_System_Task(void);
+void Kernel_System_Idle(void);
 void Kernel_User_Main(void);
 
 #endif /* _ETSSOS_KERNEL_SYSTEM_H_ */

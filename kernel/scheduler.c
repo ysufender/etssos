@@ -1,5 +1,7 @@
 #include "scheduler.h"
 
+#include "interrupt.h"
+#include "io.h"
 #include "task.h"
 #include "timer.h"
 
@@ -16,11 +18,19 @@ void Kernel_Scheduler_Init(void) {
 }
 
 void Kernel_Scheduler_Tick(void) {
+    if (Kernel_Task_Count == 1) {
+        return;
+    }
+
     Kernel_Task* next = 0;
     uint8_t priority = 0;
 
     for (uint8_t i = 0; i < Kernel_Task_Count; i++) {
         Kernel_Task* const task = &Kernel_Task_Pool[i];
+
+        if (task == Kernel_Scheduler_Current) {
+            continue;
+        }
 
         if (task->state == KERNEL_TASK_SLEEPING &&
             Kernel_Timer_Ticks >= task->wakeTick) {
@@ -34,8 +44,9 @@ void Kernel_Scheduler_Tick(void) {
         }
     }
 
-    if (!next || next == Kernel_Scheduler_Current)
+    if (!next || next == Kernel_Scheduler_Current) {
         return;
+    }
 
     if (Kernel_Scheduler_Current &&
         Kernel_Scheduler_Current->state == KERNEL_TASK_RUNNING) {

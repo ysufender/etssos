@@ -6,8 +6,6 @@
 Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTERRUPT_COUNT] = { 0 };
 
 void Kernel_Interrupt_Dispatch(void) {
-    uint32_t const ps = Kernel_Interrupt_Disable();
-
     uint32_t const interrupts = Kernel_Interrupt_Read();
 
     for (uint32_t i = 0; i < KERNEL_INTERRUPT_COUNT; i++) {
@@ -19,8 +17,6 @@ void Kernel_Interrupt_Dispatch(void) {
             }
         }
     }
-
-    Kernel_Interrupt_Restore(ps);
 }
 
 void Kernel_Interrupt_Software_Dispatch(void) {

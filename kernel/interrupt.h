@@ -96,7 +96,7 @@ extern Kernel_Interrupt_Handler Kernel_Interrupt_RegistrationVector[KERNEL_INTER
 static inline uint32_t Kernel_Interrupt_Disable(void) {
     uint32_t old;
     __asm__ volatile (
-        "rsil %0, 2"
+        "rsil %0, 15"
         : "=a" (old));
     return old;
 }

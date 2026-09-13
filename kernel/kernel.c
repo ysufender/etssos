@@ -22,7 +22,7 @@ void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
     Kernel_Interrupt_Init();
     Kernel_Scheduler_Init();
-    Kernel_Task_Create("idlet", Kernel_Task_Idle, 0);
+    Kernel_Task_Create("idlet", Kernel_System_Idle, 0);
     Kernel_Task_Create("systemt", Kernel_System_Task, 255);
     Kernel_Scheduler_Start();
     Kernel_Kernel_Panic_Unreachable();
@@ -66,6 +66,8 @@ void noreturn Kernel_Kernel_Panic_Dump() {
 }
 
 void Kernel_Kernel_Panic(void) {
+    uint32_t const ps = Kernel_Interrupt_Disable();
+
     uint32_t cause;
     __asm__ volatile (
         "rsr.exccause %0"
@@ -77,6 +79,8 @@ void Kernel_Kernel_Panic(void) {
     else {
         Kernel_Kernel_Panic_Dump();
     }
+
+    Kernel_Interrupt_Restore(ps);
 }
 
 void noreturn Kernel_Kernel_Panic_Unreachable(void) {
@@ -95,6 +99,8 @@ void noreturn Kernel_Kernel_Panic_NonMaskable(void) {
 }
 
 void Kernel_Kernel_Panic_UserError(void) {
+    uint32_t const ps = Kernel_Interrupt_Disable();
+
     uint32_t cause;
     __asm__ volatile (
         "rsr.exccause %0"
@@ -107,6 +113,8 @@ void Kernel_Kernel_Panic_UserError(void) {
         Kernel_IO_PutStringLine("Panic in userspace code.");
         Kernel_Kernel_Panic_Dump();
     }
+
+    Kernel_Interrupt_Restore(ps);
 }
 
 void noreturn Kernel_Kernel_Panic_Double(void) {

@@ -1,6 +1,8 @@
 #include "task.h"
 
 #include "error.h"
+#include "interrupt.h"
+#include "io.h"
 #include "scheduler.h"
 #include "timer.h"
 
@@ -43,7 +45,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
 
 void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const task) {
     task->state = KERNEL_TASK_TERMINATED;
-    Kernel_Scheduler_Tick();
+    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
     Kernel_Task_Idle();
 }
 
@@ -54,7 +56,10 @@ void Kernel_Task_Sleep(Kernel_Timer_Mode const mode, uint32_t const amount) {
                                          * (mode == Kernel_Timer_Mode_Seconds
                                          ? 1000
                                          : 1);
-    Kernel_Scheduler_Tick();
+    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+}
+void Kernel_Task_Yield(void) {
+    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
 }
 
 void __attribute__((noreturn)) Kernel_Task_Idle(void) {

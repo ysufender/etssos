@@ -46,6 +46,7 @@ Kernel_Task*                   Kernel_Task_Create(char const* const,
                                                   uint8_t const);
 void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const);
 void                           Kernel_Task_Sleep(Kernel_Timer_Mode const, uint32_t const);
+void                           Kernel_Task_Yield(void);
 void __attribute__((noreturn)) Kernel_Task_Idle(void);
 
 #endif /* _ETSSOS_KERNEL_TASK_H_ */
