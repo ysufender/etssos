@@ -9,6 +9,13 @@ void Kernel_Mutex_Lock(Kernel_Mutex* const mutex) {
 
     if (mutex->owner == 0) {
         mutex->owner = Kernel_Scheduler_Current;
+        mutex->count = 1;
+
+        Kernel_Interrupt_Restore(ps);
+        return;
+    }
+    else if (mutex->owner == Kernel_Scheduler_Current) {
+        mutex->count++;
 
         Kernel_Interrupt_Restore(ps);
         return;
@@ -40,9 +47,12 @@ void Kernel_Mutex_Lock(Kernel_Mutex* const mutex) {
 void Kernel_Mutex_Unlock(Kernel_Mutex* const mutex) {
     uint32_t const ps = Kernel_Interrupt_Disable();
 
-    Kernel_Task* const current = Kernel_Scheduler_Current;
+    if (mutex->owner != Kernel_Scheduler_Current) {
+        Kernel_Interrupt_Restore(ps);
+        return;
+    }
 
-    if (mutex->owner != current) {
+    if (--mutex->count != 0) {
         Kernel_Interrupt_Restore(ps);
         return;
     }
@@ -57,6 +67,7 @@ void Kernel_Mutex_Unlock(Kernel_Mutex* const mutex) {
     Kernel_Mutex_TaskQueue* const node = mutex->waiters;
     mutex->waiters = node->tail;
     mutex->owner = node->head;
+    mutex->count = 1;
 
     Kernel_Interrupt_Restore(ps);
 }

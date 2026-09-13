@@ -22,10 +22,11 @@ typedef struct Kernel_Mutex_TaskQueue {
 typedef struct Kernel_Mutex {
     Kernel_Task*            owner;
     Kernel_Mutex_TaskQueue* waiters;
+    uint32_t                count;
 } Kernel_Mutex;
 
 #define Kernel_Mutex_TaskQueue_Empty (Kernel_Mutex_TaskQueue){ 0, 0 }
-#define Kernel_Mutex_Default (Kernel_Mutex){ 0, 0 }
+#define Kernel_Mutex_Default (Kernel_Mutex){ 0, 0, 0 }
 
 void Kernel_Mutex_Lock(Kernel_Mutex* const);
 void Kernel_Mutex_Unlock(Kernel_Mutex* const);
