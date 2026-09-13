@@ -1,5 +1,4 @@
 #include "../kernel/io.h"
-#include "../kernel/timer.h"
 #include "../kernel/task.h"
 #include "../kernel/scheduler.h"
 

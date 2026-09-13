@@ -1,8 +1,6 @@
-#include <stdarg.h>
-
-#include "../config/etssos_config.h"
-
 #include "kernel.h"
+
+#include "../drivers/uart/uart.h"
 
 #include "interrupt.h"
 #include "timer.h"
@@ -28,22 +26,6 @@ void Kernel_Kernel_Main(void) {
     Kernel_Kernel_Panic_Unreachable();
 }
 
-void Kernel_Kernel_DumpInfo(void) {
-    Kernel_IO_PutStringLine("Kernel Info:");
-    Kernel_IO_PrintFormat("Name     : %s\n", ETSSOS_NAME);
-    Kernel_IO_PrintFormat("Version  : %s\n", ETSSOS_VERSION);
-    Kernel_IO_PrintFormat("Compiler : %s\n", ETSSOS_CC);
-    Kernel_IO_PrintFormat("CFLAGS   : %s\n", ETSSOS_CFLAGS);
-    Kernel_IO_PrintFormat("Linker   : %s\n", ETSSOS_LD);
-    Kernel_IO_PrintFormat("LDFLAGS  : %s\n", ETSSOS_LDFLAGS);
-    Kernel_IO_PrintFormat("Assembler: %s\n", ETSSOS_AS);
-    Kernel_IO_PrintFormat("ASFLAGS  : %s\n", ETSSOS_ASFLAGS);
-    Kernel_IO_PrintFormat("Burner   : %s\n", ETSSOS_BURNER);
-    Kernel_IO_PrintFormat("BAUD     : %u\n", ETSSOS_BAUD);
-    Kernel_IO_PrintFormat("Board    : %s\n", ETSSOS_BOARD);
-    Kernel_IO_PrintFormat("UART CLK : %u\n", DRIVERS_TIMER_CLK_FREQ);
-}
-
 void noreturn Kernel_Kernel_Panic_Dump() {
     uint8_t  cause;
     uint32_t addr;
@@ -55,14 +37,15 @@ void noreturn Kernel_Kernel_Panic_Dump() {
         "rsr.excvaddr %2"
         : "=a" (cause), "=a" (addr), "=a" (excvaddr));
 
-    Kernel_IO_PrintFormat("Address: %x\n", addr);
-    Kernel_IO_PrintFormat("Excvaddr: %x\n", excvaddr);
-    Kernel_IO_PrintFormat("Cause: %s\n", cause < 30
+    Kernel_IO_PrintFormat_Privileged("Task: %s\n", Kernel_Scheduler_Current->name);
+    Kernel_IO_PrintFormat_Privileged("Address: %x\n", addr);
+    Kernel_IO_PrintFormat_Privileged("Excvaddr: %x\n", excvaddr);
+    Kernel_IO_PrintFormat_Privileged("Cause: %s\n", cause < 30
                                             ? Kernel_Kernel_Panic_CauseStrings[cause]
                                             : "RESERVED");
-    Kernel_IO_PutStringLine("Entering fault loop.");
+    Kernel_IO_PutStringLine_Privileged("Entering fault loop.");
 
-    while (1) __asm__ volatile ( "waiti 0" );
+    Kernel_Task_Idle();
 }
 
 void Kernel_Kernel_Panic(void) {
@@ -84,17 +67,17 @@ void Kernel_Kernel_Panic(void) {
 }
 
 void noreturn Kernel_Kernel_Panic_Unreachable(void) {
-    Kernel_IO_PutStringLine("Kernel reached unreachable code.");
+    Kernel_IO_PutStringLine_Privileged("Kernel reached unreachable code.");
     while (1);
 }
 
 void noreturn Kernel_Kernel_Panic_Debug(void) {
-    Kernel_IO_PutStringLine("Kernel reached debug exception.");
+    Kernel_IO_PutStringLine_Privileged("Kernel reached debug exception.");
     Kernel_Kernel_Panic_Dump();
 }
 
 void noreturn Kernel_Kernel_Panic_NonMaskable(void) {
-    Kernel_IO_PutStringLine("Kernel reached a non-maskable interrupt.");
+    Kernel_IO_PutStringLine_Privileged("Kernel reached a non-maskable interrupt.");
     Kernel_Kernel_Panic_Dump();
 }
 
@@ -110,7 +93,7 @@ void Kernel_Kernel_Panic_UserError(void) {
         Kernel_Interrupt_Dispatch();
     }
     else {
-        Kernel_IO_PutStringLine("Panic in userspace code.");
+        Kernel_IO_PutStringLine_Privileged("Panic in userspace code.");
         Kernel_Kernel_Panic_Dump();
     }
 
@@ -118,7 +101,7 @@ void Kernel_Kernel_Panic_UserError(void) {
 }
 
 void noreturn Kernel_Kernel_Panic_Double(void) {
-    Kernel_IO_PutStringLine("Double panic.");
+    Kernel_IO_PutStringLine_Privileged("Double panic.");
 
     uint32_t addr;
 
@@ -126,7 +109,7 @@ void noreturn Kernel_Kernel_Panic_Double(void) {
         "rsr.epc2 %0"
         : "=a" (addr));
 
-    Kernel_IO_PrintFormat("Most Recent Addr: %x\n", addr);
+    Kernel_IO_PrintFormat_Privileged("Most Recent Addr: %x\n", addr);
     Kernel_Kernel_Panic_Dump();
 }
 
