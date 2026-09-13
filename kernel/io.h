@@ -18,8 +18,6 @@ void Kernel_IO_PrintFormat(char const* const, ...);
 void Kernel_IO_PutString(char const* const);
 void Kernel_IO_PutStringLine(char const* const);
 void Kernel_IO_PutChar(char const);
-void Kernel_IO_PrintFormat_Privileged(char const* const, ...);
-void Kernel_IO_PutString_Privileged(char const* const);
-void Kernel_IO_PutStringLine_Privileged(char const* const);
+void Kernel_IO_Flush(void);
 
 #endif /* _ETSSOS_KERNEL_IO_H_ */

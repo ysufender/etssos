@@ -1,5 +1,6 @@
 #include "interrupt.h"
 
+#include "task.h"
 #include "timer.h"
 #include "io.h"
 
@@ -29,9 +30,9 @@ void Kernel_Interrupt_Software_Dispatch(void) {
 
     switch (interruptMode) {
         case 0: /* Error */
-            Kernel_IO_PrintFormat("Error: %u", parameter);
+            Kernel_IO_PrintFormat("Error: %u\n", parameter);
             __asm__ volatile ( "ill" );
-            while (1);
+            while (1) Kernel_Task_Yield();
     }
 }
 
@@ -50,7 +51,7 @@ void Kernel_Interrupt_Init(void) {
         ( 1 << KERNEL_INTERRUPT_SOURCE_SOFT)
         /* | ( 1 << KERNEL_INTERRUPT_SOURCE_WDT) */
         | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC1)
-        | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC2)
+        /* | ( 1 << KERNEL_INTERRUPT_SOURCE_TIMER_FRC2) */
     );
 
     /* NonosSDK had this */

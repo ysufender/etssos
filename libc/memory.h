@@ -11,8 +11,10 @@
 #ifndef _ETSSOS_LIBC_MEMORY_H_
 #define _ETSSOS_LIBC_MEMORY_H_
 
-#include <stddef.h>
+#include <stdint.h>
 
-void* memcpy(void* const, void const* const, size_t);
+void* memcpy(void* const, void const* const, uint32_t const);
+void* malloc(uint32_t const);
+void  free(void* const);
 
 #endif /* _ETSSOS_LIBC_MEMORY_H_ */
