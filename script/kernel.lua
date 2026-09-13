@@ -6,6 +6,7 @@ local Efile = require "efile"
 local Common = require "script.common"
 
 local sources = {
+    "mutex.c",
     "scheduler.c",
     "timer.c",
     "interrupt.c",
@@ -17,6 +18,7 @@ local sources = {
 }
 
 local other = {
+    "kernel/mutex.h",
     "kernel/system.h",
     "kernel/task.h",
     "kernel/scheduler.h",

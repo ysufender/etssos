@@ -49,4 +49,10 @@ void                           Kernel_Task_Sleep(Kernel_Timer_Mode const, uint32
 void                           Kernel_Task_Yield(void);
 void __attribute__((noreturn)) Kernel_Task_Idle(void);
 
+static inline void Kernel_Task_Join(Kernel_Task* const task) {
+    if (task->state == KERNEL_TASK_BLOCKED) {
+        task->state = KERNEL_TASK_READY;
+    }
+}
+
 #endif /* _ETSSOS_KERNEL_TASK_H_ */

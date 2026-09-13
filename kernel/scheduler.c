@@ -1,12 +1,10 @@
 #include "scheduler.h"
 
-#include "interrupt.h"
-#include "io.h"
 #include "task.h"
 #include "timer.h"
 
-volatile Kernel_Task* Kernel_Scheduler_Current  = 0;
-volatile uint8_t      Kernel_Scheduler_Switched = 0;
+Kernel_Task* Kernel_Scheduler_Current  = 0;
+uint8_t      Kernel_Scheduler_Switched = 0;
 
 static Kernel_Timer* Kernel_Scheduler_Timer;
 

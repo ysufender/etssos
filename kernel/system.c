@@ -10,7 +10,10 @@ void Kernel_System_Task(void) {
     Kernel_IO_Init();
     Kernel_Pin_Init();
 
-    Kernel_Task_Create("user", Kernel_User_Main, 254);
+    Kernel_Task_Join(Kernel_Task_Create("user", Kernel_User_Main, 254));
+
+    while (1) Kernel_IO_PutStringLine("Hello System.");
+
     Kernel_Task_Terminate(Kernel_Scheduler_Current);
 }
 

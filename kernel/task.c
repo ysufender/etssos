@@ -34,7 +34,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
     task->stackSize = KERNEL_TASK_STACK_SIZE;
     task->wakeTick  = 0;
     task->priority  = priority;
-    task->state     = KERNEL_TASK_READY;
+    task->state     = KERNEL_TASK_BLOCKED;
     task->name[15]  = '\0';
     for (uint8_t i = 0; name[i] && i < 15; i++) {
         task->name[i] = name[i];

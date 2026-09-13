@@ -1,8 +1,11 @@
 #include <stdarg.h>
 
 #include "io.h"
+#include "mutex.h"
 
 #include "../drivers/uart/uart.h"
+
+Kernel_Mutex Kernel_IO_Mutex = Kernel_Mutex_Default;
 
 void Kernel_IO_printInt(uint32_t const num) {
     uint32_t tmp = num;
@@ -66,7 +69,9 @@ void Kernel_IO_PrintFormat(char const* const fmt, ...) {
         switch (fmt[i]) {
             case '%':
                 if (escaping) {
+                    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
                     Drivers_UART_PutChar('%');
+                    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
                     escaping = 0;
                 }
                 else { escaping = 1; }
@@ -74,8 +79,10 @@ void Kernel_IO_PrintFormat(char const* const fmt, ...) {
 
             case 'u':
                 if (escaping) {
+                    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
                     uint32_t const unsign = va_arg(args, uint32_t);
                     Kernel_IO_printInt(unsign);
+                    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
                     escaping = 0;
                     break;
                 }
@@ -83,9 +90,11 @@ void Kernel_IO_PrintFormat(char const* const fmt, ...) {
             
             case 'd':
                 if (escaping) {
+                    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
                     int32_t const sign = va_arg(args, int32_t);
                     if (sign < 0) { Drivers_UART_PutChar('-'); }
                     Kernel_IO_printInt(sign < 0 ? -sign : sign);
+                    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
                     escaping = 0;
                     break;
                 }
@@ -102,15 +111,19 @@ void Kernel_IO_PrintFormat(char const* const fmt, ...) {
 
             case 'x':
                 if (escaping) {
+                    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
                     uint32_t const integer = va_arg(args, uint32_t);
                     Kernel_IO_printHex(integer);
+                    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
                     escaping = 0;
                     break;
                 }
                 __attribute__((fallthrough));
 
             default:
+                Kernel_Mutex_Lock(&Kernel_IO_Mutex);
                 Drivers_UART_PutChar(fmt[i]);
+                Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
                 break;
         }
     }
@@ -119,14 +132,20 @@ void Kernel_IO_PrintFormat(char const* const fmt, ...) {
 }
 
 void Kernel_IO_PutString(char const* const str) {
+    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
     for (uint32_t i = 0; str[i] != '\0'; i++) {
         Drivers_UART_PutChar(str[i]);
     }
+    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
 }
 
 void Kernel_IO_PutStringLine(char const* const str) {
-    Kernel_IO_PutString(str);
+    Kernel_Mutex_Lock(&Kernel_IO_Mutex);
+    for (uint32_t i = 0; str[i] != '\0'; i++) {
+        Drivers_UART_PutChar(str[i]);
+    }
     Drivers_UART_PutChar('\n');
+    Kernel_Mutex_Unlock(&Kernel_IO_Mutex);
 }
 
 void Kernel_IO_PutChar(char const ch) {

@@ -18,7 +18,7 @@ void                           Kernel_Scheduler_Init(void);
 void                           Kernel_Scheduler_Tick(void);
 void __attribute__((noreturn)) Kernel_Scheduler_Start(void);
 
-extern volatile Kernel_Task* Kernel_Scheduler_Current;
-extern volatile uint8_t      Kernel_Scheduler_Switched;
+extern Kernel_Task* Kernel_Scheduler_Current;
+extern uint8_t      Kernel_Scheduler_Switched;
 
 #endif /* _ETSSOS_KERNEL_SCHEDULER_H_ */
