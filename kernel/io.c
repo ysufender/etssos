@@ -154,7 +154,7 @@ uint8_t Kernel_IO_GetChar(void) {
     return ch;
 }
 
-void Kernel_IO_GetString(char* const buf, uint32_t const max) {
+uint32_t Kernel_IO_GetString(char* const buf, uint32_t const max) {
     uint32_t i = 0;
     for (; i < max - 1; i++) {
         char const ch = Kernel_IO_GetChar();
@@ -162,6 +162,7 @@ void Kernel_IO_GetString(char* const buf, uint32_t const max) {
         buf[i] = ch;
     }
     buf[i] = '\0';
+    return i;
 }
 
 void Kernel_IO_Flush(void) {

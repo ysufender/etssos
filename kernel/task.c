@@ -43,7 +43,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
     return task;
 }
 
-void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const task) {
+void __attribute__((noreturn)) Kernel_Task_Terminate(Kernel_Task* const task) {
     task->state = KERNEL_TASK_TERMINATED;
     Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
     Kernel_Task_Idle();
@@ -66,4 +66,10 @@ void __attribute__((noreturn)) Kernel_Task_Idle(void) {
     while (1) {
         __asm__ volatile ( "waiti 0" );;
     }
+}
+
+void __attribute__((noreturn)) Kernel_Task_Exit() {
+    Kernel_Scheduler_Current->state = KERNEL_TASK_TERMINATED;
+    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+    Kernel_Task_Idle();
 }

@@ -44,10 +44,11 @@ extern uint8_t     Kernel_Task_Count;
 Kernel_Task*                   Kernel_Task_Create(char const* const,
                                                   Kernel_Task_Entry const,
                                                   uint8_t const);
-void __attribute__((noreturn)) Kernel_Task_Terminate(volatile Kernel_Task* const);
+void __attribute__((noreturn)) Kernel_Task_Terminate(Kernel_Task* const);
 void                           Kernel_Task_Sleep(Kernel_Timer_Mode const, uint32_t const);
 void                           Kernel_Task_Yield(void);
 void __attribute__((noreturn)) Kernel_Task_Idle(void);
+void __attribute__((noreturn)) Kernel_Task_Exit();
 
 static inline void Kernel_Task_Join(Kernel_Task* const task) {
     if (task->state == KERNEL_TASK_BLOCKED) {

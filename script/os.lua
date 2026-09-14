@@ -6,23 +6,16 @@ local Efile = require "efile"
 local Common = require "script.common"
 
 local sources = {
-    "memory.c",
-    "math.c",
-    "ringbuffer.c",
-    "string.c",
+    "shell.c",
 }
 
 local other = {
-    "libc/string.h",
-    "libc/ringbuffer.h",
-    "libc/math.h",
-    "libc/memory.h",
-    "script/libc.lua",
+    "os/shell.h",
 }
 
 ---@param sub_path string
 ---@return string
-local function libc(sub_path) return "libc/"..sub_path end
+local function os(sub_path) return "os/"..sub_path end
 
 ---@param options Common.Options
 ---@return Efile.Step[]
@@ -31,7 +24,7 @@ local function steps(options)
     local step_names = { }
 
     for _, src in ipairs(sources) do
-        local resolved_src = libc(src)
+        local resolved_src = os(src)
         local cmd, out, pre = Common.cc(resolved_src, options)
         table.insert(step_names, out)
 
@@ -46,7 +39,7 @@ local function steps(options)
     end
 
     table.insert(_steps, Efile.Step
-        .init("libc")
+        .init("os")
         :dependOnSteps(step_names))
 
     return _steps

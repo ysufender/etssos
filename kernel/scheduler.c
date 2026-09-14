@@ -26,10 +26,6 @@ void Kernel_Scheduler_Tick(void) {
     for (uint8_t i = 0; i < Kernel_Task_Count; i++) {
         Kernel_Task* const task = &Kernel_Task_Pool[i];
 
-        if (task == Kernel_Scheduler_Current) {
-            continue;
-        }
-
         if (task->state == KERNEL_TASK_SLEEPING &&
             Kernel_Timer_Ticks >= task->wakeTick) {
             task->state = KERNEL_TASK_READY;

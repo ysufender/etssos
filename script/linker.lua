@@ -31,6 +31,7 @@ function Linker.step(project, options)
             "drivers",
             "libc",
             "user",
+            "os",
         })
         :dependOnFile("linker.ld")
         :pre("mkdir -p build/bin/")

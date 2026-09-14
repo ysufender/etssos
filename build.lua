@@ -23,6 +23,9 @@ local LibC = require "script.libc"
 ---@module "script.user"
 local User = require "script.user"
 
+---@module "script.os"
+local OS = require "script.os"
+
 ---@type Common.Options
 local options = {
     name = "etssos",
@@ -31,7 +34,7 @@ local options = {
     as = "xtensa-lx106-elf-as ",
     cc = "xtensa-lx106-elf-gcc ",
     ld = "xtensa-lx106-elf-ld ",
-    cflags = "-c -O2 -Wall -Wextra -Werror ",
+    cflags = "-c -O2 -Wall -Wextra -Werror -ffreestanding ",
     asflags = " ",
     ldflags = "-T linker.ld "
               .."-nostdlib -nostartfiles -nodefaultlibs ",
@@ -101,6 +104,7 @@ project
     :multiStep(Drivers.steps(options))
     :multiStep(LibC.steps(options))
     :multiStep(User.steps(options))
+    :multiStep(OS.steps(options))
 
     :step(Linker.step(project, options))
 
@@ -118,24 +122,11 @@ project
         .init("monitor", { always_run = true })
         :dependOnStep("upload")
         :action(function ()
-            local exec = string.format([[
-                python3 -c "
-                    import serial
-                    s = serial.Serial('%s', %d)
-                    while True:
-                        print(s.readline().decode('utf-8', errors = 'ignore'), end = '', flush = True)
-                "
-                ]], options.port:match("(.*) "), options.baud_rate)
-
-            local serial = io.popen(exec, "r")
-            if not serial then return "Failed to open serial" end
-
-            for line in serial:lines() do
-                print(line)
-            end
-
-            local _, _, code = serial:close()
-            if not code then return "Error during serial "..tostring(code) end
+            local cmd = string.format(
+                "python3 script/monitor.py %s %d",
+                options.port:match("(.*) "),
+                options.baud_rate)
+            os.execute(cmd)
         end))
 
     :step(Efile.Step

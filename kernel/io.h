@@ -14,13 +14,13 @@
 
 #include <stdint.h>
 
-void    Kernel_IO_Init(void);
-void    Kernel_IO_PrintFormat(char const* const, ...);
-void    Kernel_IO_PutString(char const* const);
-void    Kernel_IO_PutStringLine(char const* const);
-void    Kernel_IO_PutChar(char const);
-void    Kernel_IO_Flush(void);
-void    Kernel_IO_GetString(char* const, uint32_t const);
-uint8_t Kernel_IO_GetChar(void);
+void     Kernel_IO_Init(void);
+void     Kernel_IO_PrintFormat(char const* const, ...);
+void     Kernel_IO_PutString(char const* const);
+void     Kernel_IO_PutStringLine(char const* const);
+void     Kernel_IO_PutChar(char const);
+void     Kernel_IO_Flush(void);
+uint32_t Kernel_IO_GetString(char* const, uint32_t const);
+uint8_t  Kernel_IO_GetChar(void);
 
 #endif /* _ETSSOS_KERNEL_IO_H_ */
