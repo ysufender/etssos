@@ -4,6 +4,8 @@
 
 void Drivers_GPIO_Init(void) {
     for (uint8_t pin = 0; pin < DRIVERS_GPIO_PIN_CNT; pin++) {
+        if (pin >= 6 && pin <= 11) continue;
+        else if (pin == 1 || pin == 3) continue;
         Drivers_IOMUX_GPIO_SetPullup(pin, 1);
         Drivers_GPIO_PinSetup(pin);
     }

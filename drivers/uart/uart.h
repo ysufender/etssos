@@ -39,7 +39,7 @@ typedef enum word_sized DRIVERS_UART0_FIFO_BIT {
 } DRIVERS_UART0_FIFO_BIT;
 
 typedef enum word_sized DRIVERS_UART0_INT_RAW_BIT {
-    DRIVERS_UART0_INT_RAW_TX_FIFO_FULL  = 0x00000001,
+    DRIVERS_UART0_INT_RAW_RX_FIFO_FULL  = 0x00000001,
     DRIVERS_UART0_INT_RAW_TX_FIFO_EMPTY = 0x00000002,
     DRIVERS_UART0_INT_RAW_PARITY_ERR    = 0x00000004,
     DRIVERS_UART0_INT_RAW_RX_ERR        = 0x00000008,
@@ -51,7 +51,7 @@ typedef enum word_sized DRIVERS_UART0_INT_RAW_BIT {
 } DRIVERS_UART0_INT_RAW_BIT;
 
 typedef enum word_sized DRIVERS_UART0_INT_ST_BIT {
-    DRIVERS_UART0_INT_ST_TX_FIFO_FULL  = 0x00000001,
+    DRIVERS_UART0_INT_ST_RX_FIFO_FULL  = 0x00000001,
     DRIVERS_UART0_INT_ST_TX_FIFO_EMPTY = 0x00000002,
     DRIVERS_UART0_INT_ST_PARITY_ERR    = 0x00000004,
     DRIVERS_UART0_INT_ST_RX_ERR        = 0x00000008,
@@ -63,7 +63,7 @@ typedef enum word_sized DRIVERS_UART0_INT_ST_BIT {
 } DRIVERS_UART0_INT_ST_BIT;
 
 typedef enum word_sized DRIVERS_UART0_INT_ENA_BIT {
-    DRIVERS_UART0_INT_ENA_TX_FIFO_FULL  = 0x00000001,
+    DRIVERS_UART0_INT_ENA_RX_FIFO_FULL  = 0x00000001,
     DRIVERS_UART0_INT_ENA_TX_FIFO_EMPTY = 0x00000002,
     DRIVERS_UART0_INT_ENA_PARITY_ERR    = 0x00000004,
     DRIVERS_UART0_INT_ENA_RX_ERR        = 0x00000008,
@@ -75,7 +75,7 @@ typedef enum word_sized DRIVERS_UART0_INT_ENA_BIT {
 } DRIVERS_UART0_INT_ENA_BIT;
 
 typedef enum word_sized DRIVERS_UART0_INT_CLR_BIT {
-    DRIVERS_UART0_INT_CLR_TX_FIFO_FULL  = 0x00000001,
+    DRIVERS_UART0_INT_CLR_RX_FIFO_FULL  = 0x00000001,
     DRIVERS_UART0_INT_CLR_TX_FIFO_EMPTY = 0x00000002,
     DRIVERS_UART0_INT_CLR_PARITY_ERR    = 0x00000004,
     DRIVERS_UART0_INT_CLR_RX_ERR        = 0x00000008,
@@ -144,11 +144,13 @@ typedef enum word_sized DRIVERS_UART0_RXD_CNT_BIT {
     DRIVERS_UART0_RXD_CNT_EDGE_CNT = 0x000003FF,
 } DRIVERS_UART0_RXD_CNT_BIT;
 
-void Drivers_UART_DetectClock(void);
-void Drivers_UART_Init();
-void Drivers_UART_PutChar(uint8_t const);
-void Drivers_UART_PutString(char const* const);
-void Drivers_UART_SetBaud(uint32_t const);
-void Drivers_UART_ExhaustOutput();
+void    Drivers_UART_DetectClock(void);
+void    Drivers_UART_Init(void);
+void    Drivers_UART_PutChar(uint8_t const);
+uint8_t Drivers_UART_GetChar(uint8_t* const);
+void    Drivers_UART_PutString(char const* const);
+void    Drivers_UART_SetBaud(uint32_t const);
+void    Drivers_UART_ExhaustOutput(void);
+void    Drivers_UART_Interrupt(void);
 
 #endif /* _ETSSOS_DRIVERS_UART0_H_ */

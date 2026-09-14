@@ -59,7 +59,6 @@
         .org _etssos_interrupt_vector_base + 0x10
         .type DebugException, @function
         DebugException:
-            rsil a2, 15
             j Kernel_Kernel_Panic_Debug
 
         .org _etssos_interrupt_vector_base + 0x20
