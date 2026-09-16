@@ -1,10 +1,5 @@
 #include "memory.h"
 
-typedef struct LibC_Memory_HeapBlock {
-    uint32_t                      size; /* bit 0 is free flag */
-    struct LibC_Memory_HeapBlock* next;
-} LibC_Memory_HeapBlock;
-
 extern LibC_Memory_HeapBlock _heap_start;
 extern LibC_Memory_HeapBlock _heap_end;
 
@@ -41,7 +36,7 @@ void* malloc(uint32_t const _size) {
             if ((block->size >> 1) >= size + sizeof(LibC_Memory_HeapBlock) + 4) {
                 LibC_Memory_HeapBlock* split = (LibC_Memory_HeapBlock*)
                     ((uint8_t*)block + sizeof(LibC_Memory_HeapBlock) + size);
-                split->size  = (block->size >> 1) - size - sizeof(LibC_Memory_HeapBlock);
+                split->size = ((block->size >> 1) - size - sizeof(LibC_Memory_HeapBlock)) << 1;
                 split->size |= 1;
                 split->next  = block->next;
                 block->next  = split;
@@ -60,10 +55,9 @@ void free(void* const ptr) {
     if (!ptr) return;
 
     LibC_Memory_HeapBlock* block = (LibC_Memory_HeapBlock*)
-        ((uint8_t*)ptr - sizeof(LibC_Memory_HeapBlock));
+                                   ((uint8_t*)ptr - sizeof(LibC_Memory_HeapBlock));
     block->size |= 1;
 
-    // coalesce adjacent free blocks
     LibC_Memory_HeapBlock* cur = LibC_Memory_HeapHead;
     while (cur && cur->next) {
         if ((cur->size & 1) && (cur->next->size & 1)) {

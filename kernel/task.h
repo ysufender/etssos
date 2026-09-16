@@ -34,6 +34,7 @@ typedef struct Kernel_Task {
     KERNEL_TASK_STATUS state;
     char               name[16];
     Kernel_IO          io;
+    uint8_t            pid;
 } Kernel_Task;
 
 typedef void (*Kernel_Task_Entry)(void);

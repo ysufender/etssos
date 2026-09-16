@@ -35,7 +35,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
 
     Kernel_Task* const task = &Kernel_Task_Pool[Kernel_Task_Count];
     task->sp        = frame;
-    task->bp        = Kernel_Task_Stacks[Kernel_Task_Count++];
+    task->bp        = Kernel_Task_Stacks[Kernel_Task_Count];
     task->stackSize = KERNEL_TASK_STACK_SIZE;
     task->wakeTick  = 0;
     task->priority  = priority;
@@ -45,6 +45,7 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
         task->name[i] = name[i];
     }
     task->io = io;
+    task->pid = Kernel_Task_Count++;
 
     return task;
 }

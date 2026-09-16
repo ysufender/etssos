@@ -13,6 +13,11 @@
 
 #include <stdint.h>
 
+typedef struct LibC_Memory_HeapBlock {
+    uint32_t                      size; /* bit 0 is free flag */
+    struct LibC_Memory_HeapBlock* next;
+} LibC_Memory_HeapBlock;
+
 void* memcpy(void* const, void const* const, uint32_t const);
 void* malloc(uint32_t const);
 void  free(void* const);

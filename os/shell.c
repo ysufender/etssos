@@ -4,6 +4,7 @@
 #include "../kernel/task.h"
 
 #include "../libc/string.h"
+#include "../libc/memory.h"
 
 #define if_str(__str__) if (strcmp(__str__, buffer) == 0)
 
