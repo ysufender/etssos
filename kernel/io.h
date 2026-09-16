@@ -14,6 +14,13 @@
 
 #include <stdint.h>
 
+typedef struct Kernel_IO {
+    void    (*stdout)(uint8_t const);
+    uint8_t (*stdin)(uint8_t* const);
+} Kernel_IO;
+
+extern Kernel_IO Kernel_IO_Uart;
+
 void     Kernel_IO_Init(void);
 void     Kernel_IO_PrintFormat(char const* const, ...);
 void     Kernel_IO_PutString(char const* const);

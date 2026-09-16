@@ -13,6 +13,8 @@
 
 #include <stdint.h>
 
-int16_t strncmp(char const*, char const*, uint32_t);
+int16_t  strncmp(char const*, char const*, uint32_t);
+int16_t  strcmp(char const*, char const*);
+uint32_t strtoul(char const*, char** const, uint8_t const);
 
 #endif /* _ETSSOS_LIBC_STRING_H_ */

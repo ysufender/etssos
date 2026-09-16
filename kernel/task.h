@@ -12,8 +12,8 @@
 #ifndef _ETSSOS_KERNEL_TASK_H_
 #define _ETSSOS_KERNEL_TASK_H_
 
-#include "../drivers/common.h"
 #include "timer.h"
+#include "io.h"
 
 typedef enum backing(uint8_t) KERNEL_TASK_STATUS {
     KERNEL_TASK_READY,
@@ -23,6 +23,8 @@ typedef enum backing(uint8_t) KERNEL_TASK_STATUS {
     KERNEL_TASK_TERMINATED,
 } KERNEL_TASK_STATUS;
 
+extern char const* const Kernel_Task_Status_String[5];
+
 typedef struct Kernel_Task {
     uint32_t*          sp;
     uint32_t*          bp;
@@ -31,6 +33,7 @@ typedef struct Kernel_Task {
     uint8_t            priority;
     KERNEL_TASK_STATUS state;
     char               name[16];
+    Kernel_IO          io;
 } Kernel_Task;
 
 typedef void (*Kernel_Task_Entry)(void);
@@ -43,17 +46,14 @@ extern uint8_t     Kernel_Task_Count;
 
 Kernel_Task*                   Kernel_Task_Create(char const* const,
                                                   Kernel_Task_Entry const,
-                                                  uint8_t const);
+                                                  uint8_t const,
+                                                  Kernel_IO const);
 void __attribute__((noreturn)) Kernel_Task_Terminate(Kernel_Task* const);
+void                           Kernel_Task_Kill(uint32_t const);
 void                           Kernel_Task_Sleep(Kernel_Timer_Mode const, uint32_t const);
 void                           Kernel_Task_Yield(void);
 void __attribute__((noreturn)) Kernel_Task_Idle(void);
 void __attribute__((noreturn)) Kernel_Task_Exit();
-
-static inline void Kernel_Task_Join(Kernel_Task* const task) {
-    if (task->state == KERNEL_TASK_BLOCKED) {
-        task->state = KERNEL_TASK_READY;
-    }
-}
+void Kernel_Task_Join(Kernel_Task* const);
 
 #endif /* _ETSSOS_KERNEL_TASK_H_ */

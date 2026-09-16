@@ -5,9 +5,15 @@
 #include "interrupt.h"
 
 #include "../drivers/uart/uart.h"
+#include "scheduler.h"
 #include "task.h"
 
 static Kernel_Mutex    Kernel_IO_Mutex = Kernel_Mutex_Default;
+
+Kernel_IO Kernel_IO_Uart = {
+    .stdin = Drivers_UART_GetChar,
+    .stdout = Drivers_UART_PutChar,
+};
 
 void Kernel_IO_printInt(uint32_t const num) {
     uint32_t tmp = num;
@@ -145,12 +151,14 @@ void Kernel_IO_PutStringLine(char const* const str) {
 }
 
 void Kernel_IO_PutChar(char const ch) {
-    Drivers_UART_PutChar(ch);
+    while (!Kernel_Scheduler_Current) Kernel_Task_Yield();
+    Kernel_Scheduler_Current->io.stdout(ch);
 }
 
 uint8_t Kernel_IO_GetChar(void) {
+    while (!Kernel_Scheduler_Current) Kernel_Task_Yield();
     uint8_t ch;
-    while (!Drivers_UART_GetChar(&ch)) Kernel_Task_Yield();
+    while (!Kernel_Scheduler_Current->io.stdin(&ch)) Kernel_Task_Yield();
     return ch;
 }
 

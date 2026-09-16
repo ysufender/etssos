@@ -23,8 +23,8 @@ void Kernel_Kernel_Main(void) {
     Kernel_Timer_Init();
     Kernel_Interrupt_Init();
     Kernel_Scheduler_Init();
-    Kernel_Task_Join(Kernel_Task_Create("idlet", Kernel_System_Idle, 0)),
-    Kernel_Task_Join(Kernel_Task_Create("systemt", Kernel_System_Task, 255));
+    Kernel_Task_Create("idlet", Kernel_System_Idle, 0, Kernel_IO_Uart),
+    Kernel_Task_Create("systemt", Kernel_System_Task, 255, Kernel_IO_Uart);
     Kernel_Scheduler_Start();
     Kernel_Kernel_Panic_Unreachable();
 }

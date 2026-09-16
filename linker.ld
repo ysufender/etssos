@@ -25,6 +25,13 @@ SECTIONS {
         _data_end = ABSOLUTE(.);
     } >dram_seg
 
+    .hep (NOLOAD) : {
+        . = ALIGN(4);
+        _heap_start = ABSOLUTE(.);
+        . += 0x4000;
+        _heap_end = ABSOLUTE(.);
+    } >dram_seg
+
     .text : {
         _text_start = ABSOLUTE(.);
         KEEP(*boot.o(.text.interrupt_vector))
@@ -45,11 +52,4 @@ SECTIONS {
         . = ALIGN(4);
         _rodata_end = ABSOLUTE(.);
     } >dram_seg AT>iram_seg
-
-    .hep (NOLOAD) : {
-        . = ALIGN(4);
-        _heap_start = ABSOLUTE(.);
-        . += 0x4000;
-        _heap_end = ABSOLUTE(.);
-    } >dram_seg
 }

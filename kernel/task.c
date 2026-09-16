@@ -8,6 +8,10 @@
 
 extern uint32_t max(uint32_t const, uint32_t const);
 
+char const* const Kernel_Task_Status_String[]  = {
+    "Ready", "Running", "Blocked", "Sleeping", "Terminated"
+};
+
 Kernel_Task Kernel_Task_Pool[KERNEL_TASK_MAX_COUNT] = { 0 };
 uint8_t     Kernel_Task_Count                       = 0;
 
@@ -15,7 +19,8 @@ static uint32_t Kernel_Task_Stacks[KERNEL_TASK_MAX_COUNT][KERNEL_TASK_STACK_SIZE
 
 Kernel_Task* Kernel_Task_Create(char const*       const name,
                                 Kernel_Task_Entry const callback,
-                                uint8_t           const priority) {
+                                uint8_t           const priority,
+                                Kernel_IO         const io) {
     if (Kernel_Task_Count >= KERNEL_TASK_MAX_COUNT) {
         THROW(Kernel_Error_StackOverflow); 
     }
@@ -34,11 +39,12 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
     task->stackSize = KERNEL_TASK_STACK_SIZE;
     task->wakeTick  = 0;
     task->priority  = priority;
-    task->state     = KERNEL_TASK_BLOCKED;
+    task->state     = KERNEL_TASK_READY;
     task->name[15]  = '\0';
     for (uint8_t i = 0; name[i] && i < 15; i++) {
         task->name[i] = name[i];
     }
+    task->io = io;
 
     return task;
 }
@@ -72,4 +78,20 @@ void __attribute__((noreturn)) Kernel_Task_Exit() {
     Kernel_Scheduler_Current->state = KERNEL_TASK_TERMINATED;
     Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
     Kernel_Task_Idle();
+}
+
+void Kernel_Task_Kill(uint32_t const pid) {
+    if (Kernel_Scheduler_Current->priority >= Kernel_Task_Pool[pid].priority) {
+        Kernel_Task_Pool[pid].state = KERNEL_TASK_TERMINATED;
+
+        if (Kernel_Scheduler_Current == &Kernel_Task_Pool[pid]) {
+            Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+            Kernel_Task_Idle();
+        }
+    }
+}
+
+void Kernel_Task_Join(Kernel_Task* const task) {
+    while (task->state != KERNEL_TASK_TERMINATED) Kernel_Task_Yield();
+    Kernel_Task_Exit();
 }

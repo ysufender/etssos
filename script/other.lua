@@ -42,7 +42,7 @@ function Other.upload(options)
                     .."write-flash "..address.." "..match
 
         table.insert(steps, Efile.Step
-            .init(match)
+            .init(match, { always_run = true })
             :dependOnStep("create_bin")
             :dependOnFile("script/other.lua")
             :action(cmd))
