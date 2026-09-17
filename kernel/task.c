@@ -52,22 +52,18 @@ Kernel_Task* Kernel_Task_Create(char const*       const name,
 
 void __attribute__((noreturn)) Kernel_Task_Terminate(Kernel_Task* const task) {
     task->state = KERNEL_TASK_TERMINATED;
-    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+    Kernel_Task_Yield();
     Kernel_Task_Idle();
 }
 
 void Kernel_Task_Sleep(Kernel_Timer_Mode const mode, uint32_t const amount) {
-    uint32_t const ps = Kernel_Interrupt_Disable();
-
     Kernel_Scheduler_Current->state    = KERNEL_TASK_SLEEPING;
     Kernel_Scheduler_Current->wakeTick = Kernel_Timer_Ticks
                                        + (amount
                                           * (mode == Kernel_Timer_Mode_Seconds
                                           ? 1000
                                           : 1));
-    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
-
-    Kernel_Interrupt_Restore(ps);
+    Kernel_Task_Yield();
 }
 
 void Kernel_Task_Yield(void) {
@@ -82,7 +78,7 @@ void __attribute__((noreturn)) Kernel_Task_Idle(void) {
 
 void __attribute__((noreturn)) Kernel_Task_Exit() {
     Kernel_Scheduler_Current->state = KERNEL_TASK_TERMINATED;
-    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+    Kernel_Task_Yield();
     Kernel_Task_Idle();
 }
 
@@ -91,7 +87,7 @@ void Kernel_Task_Kill(uint32_t const pid) {
         Kernel_Task_Pool[pid].state = KERNEL_TASK_TERMINATED;
 
         if (Kernel_Scheduler_Current == &Kernel_Task_Pool[pid]) {
-            Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+            Kernel_Task_Yield();
             Kernel_Task_Idle();
         }
     }

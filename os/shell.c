@@ -40,8 +40,6 @@ void OS_Shell(void) {
     char const* cmd;
     char const* errmsg;
 
-    Kernel_Task_Sleep(Kernel_Timer_Mode_Milliseconds, 100);
-
     while (1) {
         Kernel_IO_PutString("shell@etssos $ ");
         Kernel_IO_GetString(buffer, 128);
