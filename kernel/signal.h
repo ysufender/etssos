@@ -37,5 +37,6 @@ void    Kernel_Signal_Unsubscribe(Kernel_Signal const);
 void    Kernel_Signal_Send(Kernel_Signal const);
 void    Kernel_Signal_Unsend(Kernel_Signal const);
 uint8_t Kernel_Signal_Await(Kernel_Signal const);
+uint8_t Kernel_Signal_Up(Kernel_Signal const);
 
 #endif /* _ETSSOS_KERNEL_SIGNAL_H_ */

@@ -2,6 +2,7 @@
 
 #include "../kernel/io.h"
 #include "../kernel/task.h"
+#include "../kernel/signal.h"
 
 #include "../libc/string.h"
 #include "../libc/memory.h"
@@ -57,6 +58,9 @@ void OS_Shell(void) {
                 Kernel_IO_PutStringLine("\tkill <pid>");
                 Kernel_IO_PutStringLine("\treboot");
                 Kernel_IO_PutStringLine("\tchmod <pid> <new>");
+                Kernel_IO_PutStringLine("\tsignal <sign>");
+                Kernel_IO_PutStringLine("\tunsign <sign>");
+                Kernel_IO_PutStringLine("\tsstat");
             }
             else if (argc > 1) {
                 errmsg = "Too manu arguments.";
@@ -66,6 +70,28 @@ void OS_Shell(void) {
                 errmsg = "Not implemented.";
                 goto error;
             }
+        }
+        else if_str ("unsign") {
+            if (!argc) {
+                errmsg = "Expected signal number.";
+                goto error;
+            }
+            uint32_t const sign = strtoul(_next(&args, &argc), 0, 0);
+            Kernel_Signal_Unsend(sign);
+        }
+        else if_str ("sstat") {
+            for (int8_t i = 63; i >= 0; i--) {
+                Kernel_IO_PutChar('0' + (Kernel_Signal_Vector[i].active & 1));
+            }
+            Kernel_IO_PutChar('\n');
+        }
+        else if_str ("signal") {
+            if (!argc) {
+                errmsg = "Expected signal number.";
+                goto error;
+            }
+            uint32_t const sign = strtoul(_next(&args, &argc), 0, 0);
+            Kernel_Signal_Send(sign);
         }
         else if_str ("ps") {
             for (uint8_t i = 0; i < Kernel_Task_Count; i++) {

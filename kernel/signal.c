@@ -52,5 +52,9 @@ uint8_t Kernel_Signal_Await(Kernel_Signal const sign) {
 
     while (subscribed && !Kernel_Signal_Vector[sign].active) Kernel_Task_Yield();
 
-    return subscribed;
+    return 0;
+}
+
+uint8_t Kernel_Signal_Up(Kernel_Signal const sign) {
+    return Kernel_Signal_Vector[sign].active;
 }
