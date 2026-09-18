@@ -33,6 +33,7 @@ void Kernel_Signal_Unsubscribe(Kernel_Signal const sign) {
 
 void Kernel_Signal_Send(Kernel_Signal const sign) {
     Kernel_Signal_Vector[sign].active = 1;
+    Kernel_Signal_Vector[sign].sender = Kernel_Scheduler_Current->pid;
 }
 
 void Kernel_Signal_Unsend(Kernel_Signal const sign) {

@@ -6,7 +6,7 @@
  *
  *
  * NAME       : os/shell.h
- * DESCRIPTION: UART based asynchronous shell implementation.
+ * DESCRIPTION: Asynchronous shell implementation.
  */
 
 #ifndef _ETSSOS_OS_SHELL_H_

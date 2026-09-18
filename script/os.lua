@@ -7,10 +7,12 @@ local Common = require "script.common"
 
 local sources = {
     "shell.c",
+    "protector.c",
 }
 
 local other = {
     "os/shell.h",
+    "os/protector.h",
 }
 
 ---@param sub_path string

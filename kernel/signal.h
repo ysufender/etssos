@@ -19,6 +19,7 @@ typedef enum backing(uint64_t) Kernel_Signal {
     Kernel_Signal_Segfault = 0,
     Kernel_Signal_Abort,
     Kernel_Signal_Trap,
+    Kernel_Signal_Fault,
     /* Reserved */
     Kernel_Signal_User = 32
     /* User Defined */
@@ -27,6 +28,7 @@ typedef enum backing(uint64_t) Kernel_Signal {
 
 typedef struct Kernel_Signal_Entry {
     uint8_t active;
+    uint8_t sender;
     uint8_t subscribers[32];
 } Kernel_Signal_Entry;
 
