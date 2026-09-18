@@ -59,6 +59,7 @@ void OS_Shell(void) {
                 Kernel_IO_PutStringLine("\tsignal <sign>");
                 Kernel_IO_PutStringLine("\tunsign <sign>");
                 Kernel_IO_PutStringLine("\tsstat");
+                Kernel_IO_PutStringLine("\ttick");
             }
             else if (argc > 1) {
                 errmsg = "Too manu arguments.";
@@ -68,6 +69,9 @@ void OS_Shell(void) {
                 errmsg = "Not implemented.";
                 goto error;
             }
+        }
+        else if_str ("tick") {
+            Kernel_IO_PrintFormat("%u%u\n", (uint32_t)(Kernel_Timer_Ticks >> 32), (uint32_t)Kernel_Timer_Ticks);
         }
         else if_str ("unsign") {
             if (!argc) {

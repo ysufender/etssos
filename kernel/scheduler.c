@@ -6,7 +6,7 @@
 Kernel_Task* Kernel_Scheduler_Current  = 0;
 uint8_t      Kernel_Scheduler_Switched = 0;
 
-static Kernel_Timer* Kernel_Scheduler_Timer;
+Kernel_Timer* Kernel_Scheduler_Timer;
 
 void Kernel_Scheduler_Init(void) {
     Kernel_Scheduler_Timer = Kernel_Timer_Create(Kernel_Timer_Mode_Milliseconds, 10, Kernel_Scheduler_Tick);
@@ -16,6 +16,7 @@ void Kernel_Scheduler_Init(void) {
 }
 
 void Kernel_Scheduler_Tick(void) {
+    Kernel_Scheduler_Switched = 0;
     if (Kernel_Task_Count == 1) {
         return;
     }
@@ -28,6 +29,7 @@ void Kernel_Scheduler_Tick(void) {
 
         if (task->state == KERNEL_TASK_SLEEPING
             && Kernel_Timer_Ticks >= task->wakeTick) {
+            task->wakeTick = 0;
             task->state = KERNEL_TASK_READY;
         }
 

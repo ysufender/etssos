@@ -57,17 +57,22 @@ void __attribute__((noreturn)) Kernel_Task_Terminate(Kernel_Task* const task) {
 }
 
 void Kernel_Task_Sleep(Kernel_Timer_Mode const mode, uint32_t const amount) {
+    uint32_t const ps = Kernel_Interrupt_Disable();
     Kernel_Scheduler_Current->state    = KERNEL_TASK_SLEEPING;
     Kernel_Scheduler_Current->wakeTick = Kernel_Timer_Ticks
                                        + (amount
                                           * (mode == Kernel_Timer_Mode_Seconds
                                           ? 1000
                                           : 1));
-    Kernel_Task_Yield();
+    Kernel_Interrupt_Restore(ps);
+
+    while (Kernel_Scheduler_Current->state == KERNEL_TASK_SLEEPING) Kernel_Task_Yield();
 }
 
 void Kernel_Task_Yield(void) {
-    Kernel_Interrupt_Trigger(KERNEL_INTERRUPT_SOURCE_TIMER_FRC1);
+    extern Kernel_Timer* Kernel_Scheduler_Timer;
+    Kernel_Scheduler_Timer->counter = Kernel_Scheduler_Timer->alarm;
+    __asm__ volatile ( "waiti 0" );;
 }
 
 void __attribute__((noreturn)) Kernel_Task_Idle(void) {
